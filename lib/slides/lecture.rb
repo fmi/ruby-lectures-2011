@@ -1,6 +1,6 @@
 # encoding: utf-8
-class Presentation
-  PRESENTATION_TEMPLATE = 'slim/lecture.slim'
+class Lecture
+  LECTURE_TEMPLATE = 'slim/lecture.slim'
   MONTHS = %w(януари февруари март април май юни юли август септември октомври ноември декември)
 
   attr_reader :title, :date, :slug, :slides_html
@@ -12,7 +12,7 @@ class Presentation
   end
 
   def render
-    Slim::Template.new(PRESENTATION_TEMPLATE).render(self)
+    Slim::Template.new(LECTURE_TEMPLATE).render(self)
   end
 
   def date

@@ -8,10 +8,10 @@ class Builder
   end
 
   def html
-    input        = File.read source_file
-    presentation = Presentation.new input, title, date
+    input   = File.read source_file
+    lecture = Lecture.new input, title, date
 
-    presentation.render
+    lecture.render
   end
 
   def output_filename
