@@ -7,20 +7,20 @@ class Builder
     end
   end
 
-  def build
-    input        = File.read input_file
+  def html
+    input        = File.read source_file
     presentation = Presentation.new input, title, date
 
-    open(output_file, 'w') do |file|
-      file.write presentation.render
-    end
+    presentation.render
   end
 
-  def input_file
+  def output_filename
+    "#@slug.html"
+  end
+
+  private
+
+  def source_file
     "src/#@slug.slim"
-  end
-
-  def output_file
-    "target/#@slug.html"
   end
 end
