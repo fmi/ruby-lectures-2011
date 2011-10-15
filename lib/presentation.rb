@@ -5,11 +5,10 @@ class Presentation
 
   attr_reader :title, :date, :slug, :slides_html
 
-  def initialize(attributes)
-    @title = attributes[:title]
-    @date  = attributes[:date]
-    @slug  = attributes[:slug]
-    @slides_html = generate_html
+  def initialize(input, title, date)
+    @title = title
+    @date  = date
+    @slides_html = generate_html input
   end
 
   def render
@@ -22,7 +21,7 @@ class Presentation
 
   private
 
-  def generate_html
-    Slim::Template.new("src/#{slug}.slim").render(SlideHelper.new)
+  def generate_html(input)
+    Slim::Template.new { input }.render(SlideHelper.new)
   end
 end
