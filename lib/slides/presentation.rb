@@ -1,6 +1,6 @@
 # encoding: utf-8
 class Presentation
-  PRESENTATION_TEMPLATE = 'slim/presentation.slim'
+  PRESENTATION_TEMPLATE = 'slim/lecture.slim'
   MONTHS = %w(януари февруари март април май юни юли август септември октомври ноември декември)
 
   attr_reader :title, :date, :slug, :slides_html

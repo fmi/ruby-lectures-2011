@@ -21,6 +21,6 @@ class Builder
   private
 
   def source_file
-    "src/#@slug.slim"
+    "lectures/#@slug.slim"
   end
 end

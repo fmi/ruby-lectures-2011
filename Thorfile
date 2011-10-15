@@ -9,9 +9,9 @@ class Default < Thor
 
   desc 'rebuild', 'Rebuilds all presentations'
   def rebuild
-    empty_directory 'target'
-    directory 'html/js', 'target/js'
-    directory 'html/css', 'target/css'
+    empty_directory 'compiled'
+    directory 'html/js', 'compiled/js'
+    directory 'html/css', 'compiled/css'
 
     slides.keys.each do |number|
       lecture number
@@ -22,7 +22,7 @@ class Default < Thor
   def lecture(index)
     builder = builder_for(index)
 
-    create_file "target/#{builder.output_filename}", builder.html.force_encoding('BINARY')
+    create_file "compiled/#{builder.output_filename}", builder.html.force_encoding('BINARY')
   end
 
   no_tasks do
@@ -31,7 +31,7 @@ class Default < Thor
     end
 
     def slides
-      @slides ||= YAML.load_file 'slides.yaml'
+      @slides ||= YAML.load_file 'lectures/index.yml'
     end
   end
 end
