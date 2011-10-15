@@ -1,0 +1,447 @@
+section
+  hgroup
+    h1 Колективът ти
+    h2 ...където обяснявам защо си говоря в множествено число
+
+  ul
+    li Стефан Кънев
+    li Николай Бачийски
+    li Димитър Димитров
+    li Андрей Радев
+
+section
+  hgroup
+    h1 Цели
+    h2 За какво ще говорим днес?
+  ul
+    li.action Какво е Ruby програма и как се изпълнява?
+    li.action Как да се справим с документацията в Ruby
+    li.action Основните типове в Ruby
+    li.action Променливи и константи
+    li.action Условни конструкции — <code>if</code>
+    li.action Дефиниране и извикване на прости функции
+
+section
+  hgroup
+    h1 Ruby програми
+  ul
+    li Програмите в Ruby са текстови файлове
+    li Няма компилация като в C или Java
+    li Изпълняват се с <code>ruby име_на_файл</code>
+
+section
+  hgroup
+    h1 Ruby програми
+    h2 Любимият на всички пример
+
+  pre
+    '
+      puts "Hello world"
+      puts "The answer of life is ", 6 * 7
+  
+  p Изпълнява се с <code>ruby hello.rb</code>
+
+section
+  hgroup
+    h1 irb
+    h2 интерактивна конзола
+
+  p Може да стартиране интерактивната конзола с <codE>irb</code>
+
+  pre
+    ' $ irb
+      >> 6 * 9
+      54
+      >> "Ruby! " * 4
+      "Ruby! Ruby! Ruby! Ruby!"
+      >> -10.abs
+      10
+
+section
+  hgroup
+    h1 Документация
+    h2 или как да разберем какво прави нещо в Ruby?
+  ul
+    li <code>ri</code> е инструмент, с който може да разглеждате документацията на клас или метод
+    li 
+       code ri String
+       '  показва документацията на класа <code>String</code>
+    li
+      code ri Numeric#abs
+      '  показва документацията на метода <code>abs</code> на класа на числата
+    li
+      code ri -i
+      '  пуска документацията в интерактивен режим. Пробвайте го.
+    li
+      ' Документацията е достъпна онлайн на 
+      a href="http://ruby-doc.org/core/" http://ruby-doc.org/core/
+    li
+      a href="http://apidock.com" APIDock
+      '  е ваш добър приятел
+
+section
+  hgroup
+    h1 Инсталация
+    h2 или как да се снабдим?
+  ul
+    li
+      a href="http://ruby-lang.org/en/downloads" http://ruby-lang.org/
+    li Windows &mdash; има RubyInstaller
+    li
+      ' Linux, Mac &mdash; пробвайте 
+      a href="http://rvm.beginrescueend.com/" RVM
+
+section
+  hgroup
+    h1 Редактори
+    h2 слайдът с много хейт
+  ul
+    li.action Забравете за IDE-тата. Това не е Java.
+    li.action Ползвайте любимия си текстов редактор
+    li.action Ако нямате такъв, може да пробвате <a href="http://redcareditor.com/">redcar</a>
+    li.action Научете Vim или Emacs. Ще ми благодарите после
+
+section
+  hgroup
+    h1 Извеждане на екрана
+    h2 Или как да досаждаме на хората с текст
+  ul
+    li.action Става с <code>puts</code>
+    li.action Например <code>puts "Chunky bacon!"</code>
+    li.action <code>puts</code> не е ключова дума, а "глобална" функция
+    li.action Може да се извика и със скоби: <code>puts("Chunky bacon!")</code>
+    li.action Последното важи за всички функции в Ruby
+
+section
+  hgroup
+    h1 Имена и неща
+    h2 или още, Урсула Ле Гуин в контекста на Ruby
+  p Нещата се наименуват с <code>=</code>
+  pre
+    ' answer = 42
+      almost_pi = 3.14
+      food = 'Chunky bacon'
+      greeting = "What's up?"
+
+section
+  hgroup
+    h1 Имена и неща
+    h2 Разликата между нещо и неговите имена
+  p
+    ' <code>=</code> не копира стойността, а насочва променливата към обекта отдясно
+  pre
+    ' >> word = "oat"
+      >> breakfast = word
+      >> dinner = word
+      >> word.insert('g', 0)
+      >> puts breakfast
+      goat
+
+section
+  hgroup
+    h1 Действия
+    h2 още известни като "методи"
+
+  pre
+    ' >> "shut up".upcase()
+      →  "SHUT UP"
+      >> "wonderful".sub("wonder", "color")
+      →  "colorful"
+      >> 3.14.floor
+      →  3
+      >> 24.gcd 56
+      →  8
+      >> 'wonderful'.sub 'wonde', 'colo'
+      →  "colorful"
+
+section
+  hgroup
+    h1 Видове променливи
+
+  pre
+    ' favourite = 'Chunky bacon' # локална
+      Tax = '20%'                # константа
+      $important = 'Money'       # глобална
+
+  p Има още: <code>@name</code> и <code>@@name</code>
+
+section
+  hgroup
+    h1 Ключови думи
+    h2 Вече заети
+
+  pre
+    ' alias    and      BEGIN    begin      break
+      case     class    def      defined?   do
+      else     elsif    END      end        ensure
+      false    for      if       in         module
+      next     nil      not      or         redo
+      rescue   retry    return   self       super
+      then     true     undef    unless     until
+      when     while    yield
+
+section
+  hgroup
+    h1 Основни типове
+    h2 1/2
+  ul
+    li.action Цели числа &mdash; <code>42</code>, <code>-271</code>, <code>1_024</code>
+    li.action Низове &mdash; <code>"chunky"</code>, <code>'bacon'</code>
+    li.action С плаваща запетая &mdash; <code>3.1415</code>
+    li.action Булеви &mdash; <code>true</code> и <code>false</code>
+    li.action Нищо &mdash; <code>nil</code>
+    li.action Масиви &mdash; <code>[2, 3, 5, 7, 11]</code>
+
+section
+  hgroup
+    h1 Основни типове
+    h2 2/2
+  ul
+    li.action Хешове &mdash; <code>{'one' => 1, 'two' => 2}</code>
+    li.action Регулярни изрази &mdash; <code>/(bb)|([^b]{2})/</code>
+    li.action Области &mdash; <code>2..6</code>, <code>'a'...'z'</code>
+    li.action Символи &mdash; <code>:name</code>, <code>:send</code>
+    li.action Анонимни функции &mdash; <code>lambda { |x| x ** 2 }</code>, <code>-> x { x ** 2 }</code>
+    li.action Обекти &mdash; <code>Person.new</code>
+
+section
+  hgroup
+    h1 Цели числа
+  pre
+    ' 0
+      1729
+      -271
+      1_000_000
+      0377        # осмични
+      0b0100_0010 # двоични
+      0xDEADBEEF  # шестнадесетични
+
+section
+  hgroup
+    h1 Числа с плаваща запетая
+  pre
+    ' 0.0
+      3.14
+      -273.15
+      1.22e28
+      1_000.001
+
+section
+  hgroup
+    h1 Текст
+  pre
+    ' 'Chunky bacon, I say!'
+      "Who is John Galt?"
+      "We're the knights who day \"Ni!\""
+      '\'0 freddled gruntbugly\' he begun'
+      'This text contains\nno newlines'
+      "This text contains\none newline"
+
+section
+  hgroup
+    h1 Операции с текст
+  pre
+    ' >> "Hello, " + " " + "chunky!"
+      →  "Hello,  chunky!"
+      >> "Ha! " * 3
+      →  "Ha! Ha! Ha! "
+      >> "%s bacon" % 'Chunky'
+      →  "Chunky bacon"
+      >> text = 'Chanky'
+      >> text[2] = 'u'
+      >> text << ' bacon'
+      >> puts text
+      Chunky bacon
+
+section
+  hgroup
+    h1 Още операции с текст
+  pre
+    ' "bacon\n".chop            # "bacon"
+      "bacon".chop              # "baco"
+      "bacon\n".chomp           # "bacon"
+      "bacon".chomp             # "bacon"
+      "Goodbye".include? 'oo'   # true
+      "Danube".length           # 6
+      "oat".insert 0, 'bl'      # "bloat"
+      "bloat".sub "bl", "m"     # "moat"
+      "bacon".upcase            # "BACON"
+      "BaCoN".downcase          # "bacon"
+
+section
+  hgroup
+    h1 Символи
+    h2 ...което ще ви обърка
+  ul
+    li.action Малко особен тип в Ruby
+    li.action <code>:something</code>, <code>:other</code> и <code>:larodi</code>
+    li.action Сходен на низ &mdash; immutable и интерниран
+    li.action Различни приложения
+    li.action Не го мислете много
+
+section
+  hgroup
+    h1 Интерполация
+  p Работи при двойни кавички, не работи при единични
+  pre
+    ' character = 'Arthur'
+      answer = 42
+      puts "#{'#'}{character} had it: #{'#'}{answer}"
+
+section
+  hgroup
+    h1 Оператори
+    h2 ...или как да оперирате с Ruby
+  pre
+    ' **  ~   /   %   +   -   &
+      <<  >>  |   ^   >   <   >=  <=  <=>
+      &&  ||  !   and or  not ||= &&=
+      =   +=  -=  *=  /=  %=  **= >>= <<=
+      ^=  &=  |=  ..  ... defined?
+
+section
+  hgroup
+    h1 Истина и лъжа
+    h2 ...където става философско
+  ul
+    li.action <code>nil</code> се оценява като "лъжа"
+    li.action <code>false</code> се оценява като "лъжа" (очевидно)
+    li.action всичко друго е истина
+    li.action <code>0</code>, <code>""</code> и <code>[]</code> са истина
+
+section
+  hgroup
+    h1 Булеви оператори
+  ul
+    li.action <code>and</code>, <code>or</code> и <code>not</code> правят това, което очаквате
+    li.action <code>&&</code>, <code>||</code> и <code>!</code> &mdash; също
+    li.action Разликата между тях е тънка. Придържайте се към първите
+
+section
+  hgroup
+    h1 Сравнение
+    h2 ...когато размерът има значение
+  pre
+    ' >> 20 > 20
+      →  false
+      >> "perl" < "ruby"
+      →  true
+      >> 5 <= 5
+      →  true
+      >> "foo" <=> "bar"
+      →  1
+
+section
+  hgroup
+    h1 Равенство
+    h2 ...където става оплетено
+  p В Ruby има четири оператора за равенство
+  pre
+    ' one == two
+      one === two
+      one.eql? two
+      one.equal? two
+
+section
+  hgroup
+    h1 Равенство
+    h2
+      ' == и equal?
+  p Това е стандартното поведение на Ruby. Има специални счучаи.
+  pre
+    ' >> one = 'chunky bacon'
+      >> two = 'chunky bacon'
+      >> one == two
+      →  true
+      >> one.equal? two
+      →  false
+
+section
+  hgroup
+    h1 Равенство
+    h2 Специалните случаи
+  p Можете ли да произнесете "интерниране"?
+  pre
+    ' >> one, two = 42, 42
+      >> one == two
+      →  true
+      >> one.equal? two
+      →  true
+  p Същото важи и за символи.
+
+section
+  hgroup
+    h1 Условия
+  p Ключовата дума е <code>if</code>
+  pre
+    ' if hungry? and sad?
+        eat_chocolate
+        listen_to_music
+        go :outside
+      end
+
+section
+  hgroup
+    h1 Условия
+    h2 или
+  p Разбира се, има и <code>else</code>
+  pre
+    ' if hungry?
+        eat
+      else
+        drink
+      end
+
+section
+  hgroup
+    h1 Условия
+    h2 ако пък
+  pre
+    ' if hungry?
+        eat
+      elsif thirsty?
+        drink
+      else
+        philosophize
+      end
+
+section
+  hgroup
+    h1 Условия
+    h2 на един ред
+  p Може да напишете това на един ред
+  pre
+    ' eat if hungry?
+
+section
+  hgroup
+    h1 Условия
+    h2 ...където научавате, че всяко условие е израз
+  pre
+    ' classification = if age < 13
+                         'young person'
+                       elsif age < 20
+                         'teenager'
+                       else
+                         'old dude'
+                       end
+section
+  hgroup
+    h1 Условия
+    h2 на един ред
+  pre
+    ' eat if hungry?
+  p Яко, а? Може и:
+  pre
+    ' order = if hungry? then 'food' else 'coffee' end
+
+section
+  hgroup
+    h1 Условия
+    h2 Освен ако
+  p <code>unless</code> е като <code>if not</code>.
+  p Всичко за <code>if</code> е приложимо
+  pre
+    ' unless tired?
+        go_out_and_run
+      end
