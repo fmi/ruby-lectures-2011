@@ -12,6 +12,7 @@ class Default < Thor
     empty_directory 'compiled'
     directory 'html/js', 'compiled/js'
     directory 'html/css', 'compiled/css'
+    copy_file 'lectures/index.yml', 'compiled/index.yml'
 
     slides.keys.each do |number|
       lecture number
