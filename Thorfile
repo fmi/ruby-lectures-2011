@@ -1,5 +1,11 @@
 require './lib/slides'
 
+class Thor::Actions::CreateFile
+  def force_on_collision?
+    true
+  end
+end
+
 class Default < Thor
   include Thor::Actions
 
