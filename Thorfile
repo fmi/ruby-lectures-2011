@@ -1,4 +1,5 @@
 require './lib/slides'
+require 'guard'
 
 class Thor::Actions::CreateFile
   def force_on_collision?
@@ -26,7 +27,11 @@ class Default < Thor
 
   desc 'watch', 'Fires up guard to rebuld presentations on demand'
   def watch
-    system 'guard'
+    listener = Guard::Listener.select_and_init
+    listener.on_change do |files|
+      files.grep(/lectures\/(\d+)-/) { lecture $1.to_i }
+    end
+    listener.start
   end
 
   desc 'lecture', 'Rebuilds a single lecture'
