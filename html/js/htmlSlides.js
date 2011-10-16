@@ -1,12 +1,12 @@
 /*
  * HTML Slideshow
  * Author: Rob Flaherty | rob@ravelrumba.com
- * Copyright (c) 2011 Rob Flaherty 
+ * Copyright (c) 2011 Rob Flaherty
  * MIT Licensed: http://www.opensource.org/licenses/mit-license.php
  */
-   
+
 var htmlSlides = {
-  
+
   //Vars
   currentSlide: 1,
   slideHash: location.hash,
@@ -15,14 +15,14 @@ var htmlSlides = {
   prevButton: null,
   nextButton: null,
   slideNumber: null,
-      
+
   init: function(options) {
     var defaultSettings = {
       hideToolbar: false,
     },
-  
+
     settings = $.extend({}, this.defaultSettings, options),
-    
+
     base = this;
 
     this.deck = $('#deck');
@@ -30,18 +30,18 @@ var htmlSlides = {
     this.prevButton = $('#prev-btn');
     this.nextButton = $('#next-btn');
     this.slideNumber = $('#slide-number');
-        
+
     //Add ids and classes to slides
     $('#deck > section').each(function(index, el) {
       $el = $(el);
       $el.attr('id', 'slide' + (index +1));
-      $el.addClass('slide');     
+      $el.addClass('slide');
     });
 
     //Set total slide count in header
     $('#slide-total').html(this.slideCount);
-      
-    //Check for hash and validate value    
+
+    //Check for hash and validate value
     if (this.slideHash && (parseInt((this.slideHash.substring(1)), 10) <= this.slideCount)) {
       this.currentSlide = parseInt(this.slideHash.replace('#', ''), 10);
     }
@@ -61,20 +61,20 @@ var htmlSlides = {
         }
       );
     }
-      
+
     //Bind control events
     this.prevButton.bind('click', $.proxy(this, 'prevSlide'));
     this.nextButton.bind('click', $.proxy(this, 'showActions'));
     $('html').bind('keydown', $.proxy(this, 'keyControls'));
-      
+
     //Set initial slide
     this.changeSlide(this.currentSlide);
-    
+
     //Ensure focus stays on window and not embedded iframes/objects
     $(window).load(function() {
       this.focus();
     });
-    
+
     //Swipe gestures
     $('.slide').swipe({
       threshold: {
@@ -87,27 +87,27 @@ var htmlSlides = {
       swipeRight: function() {
         base.prevSlide.apply(base);
       },
-    });    
+    });
 
-  },    
-  
+  },
+
   //Change slide
   changeSlide: function(id) {
-    var slideID = '#slide' + id;        
-    
+    var slideID = '#slide' + id;
+
     //Update slide classes
     this.deck.find('.slide-selected').removeClass('slide-selected');
     $(slideID).addClass('slide-selected');
-      
+
     //Update toolbar
     this.slideNumber.html(this.currentSlide);
-    
-    //Update hash      
+
+    //Update hash
     location.hash = id;
-    
+
     //Trigger newSlide event
     this.newSlideEvent(id);
-    
+
     //Hide arrows on first and last slides
     if ((id != 1) && (id != this.slideCount)) {
       this.prevButton.css('visibility', 'visible');
@@ -118,46 +118,46 @@ var htmlSlides = {
       this.nextButton.css('visibility', 'hidden');
     }
   },
-  
+
   //Next slide
   prevSlide: function() {
     if (this.currentSlide > 1) {
       this.currentSlide--;
       this.changeSlide(this.currentSlide);
-    }     
+    }
   },
-  
+
   //Previous slide
   nextSlide: function() {
     if (this.currentSlide < this.slideCount) {
       this.currentSlide++;
-      this.changeSlide(this.currentSlide); 
+      this.changeSlide(this.currentSlide);
     }
   },
-  
+
   //Reveal actions
-  showActions: function() {        
+  showActions: function() {
     var actions = $('.slide-selected').find('.action'),
       actionOns;
-      
+
     //If actions exist
     if (actions.length > 0) {
       actions.first().removeClass('action').addClass('action-on').fadeIn(250);
-          
+
       //Number of current action
       actionOns = $('.slide-selected').find('.action-on');
-          
+
       //Trigger newAction event
       $('html').trigger("newAction", actionOns.length );
     } else {
       this.nextSlide();
     }
   },
-  
+
   newSlideEvent: function(id) {
     $('html').trigger('newSlide', id);
   },
-  
+
   //Keyboard controls
   keyControls: function(event) {
     switch(event.keyCode) {
