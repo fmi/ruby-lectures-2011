@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'slim'
 require 'yaml'
+require 'albino'
 require 'fileutils'
 
 $:.unshift File.dirname(__FILE__) + '/slides'
