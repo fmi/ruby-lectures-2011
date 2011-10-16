@@ -66,6 +66,7 @@ var htmlSlides = {
     this.prevButton.bind('click', $.proxy(this, 'prevSlide'));
     this.nextButton.bind('click', $.proxy(this, 'showActions'));
     $('html').bind('keydown', $.proxy(this, 'keyControls'));
+    $('html').bind('click', $.proxy(this, 'showActions'));
 
     //Set initial slide
     this.changeSlide(this.currentSlide);
