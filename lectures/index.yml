@@ -1,4 +1,8 @@
+0:
+  title: 00. За курса
+  date: 2011-10-11
+  url: http://www.slideshare.net/skanev/ruby-0
 1:
   title: 01. Въведение в Ruby
-  slug: 01-introduction-to-ruby
   date: 2011-10-11
+  slug: 01-introduction-to-ruby

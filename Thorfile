@@ -19,6 +19,7 @@ class Default < Thor
     empty_directory 'compiled'
     directory 'html/js', 'compiled/js'
     directory 'html/css', 'compiled/css'
+    copy_file 'lectures/index.yml', 'compiled/index.yml'
 
     slides.keys.each do |number|
       lecture number
@@ -47,7 +48,12 @@ class Default < Thor
     end
 
     def slides
-      @slides ||= YAML.load_file 'lectures/index.yml'
+      return @slides if @slides
+
+      @slides = YAML.load_file 'lectures/index.yml'
+      @slides.delete_if { |index, attributes| attributes.has_key? 'url' }
+
+      @slides
     end
   end
 end
