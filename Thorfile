@@ -18,6 +18,11 @@ class Default < Thor
     end
   end
 
+  desc 'watch', 'Fires up guard to rebuld presentations on demand'
+  def watch
+    system 'guard'
+  end
+
   desc 'lecture', 'Rebuilds a single lecture'
   def lecture(index)
     builder = builder_for(index)
