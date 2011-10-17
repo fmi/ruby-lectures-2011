@@ -75,3 +75,4 @@ body{ background:#f5f6f6; }
 #deck table td { padding: 0.5em 1em; border: 3px solid gray; }
 #deck ul,
 #deck ol { margin-bottom: 2em; }
+#deck .answer { color: #6a6; font-style: italic; }
