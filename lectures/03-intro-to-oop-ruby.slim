@@ -1,0 +1,382 @@
+= slide 'Днес' do
+  ul
+    li.action Малко за ООП-то в Ruby
+    li.action Покриваме материала в широчина, на в дълбочина
+    li.action Неща от предния път: по-бавно и с повече чувство
+    li.action Повече интерактивен шел
+    li.action
+      strong Ако искате да запазя нещо и да го кача в лекцията, трябва да ми напомните.
+
+= slide 'Сайт на курса' do
+  ul
+    li.action Регистрирахте ли се?
+    li.action Свикнете да ползвате форумите
+    li.action
+      a href="http://fmi.ruby.bg/topics/54" Тема във форумите за днес
+
+= slide 'Първа задача' do
+  ul
+    li.action Крайният срок е следващия понеделник
+    li.action Забравих да кажа, но няма да има ограничения
+    li.action Все пак се надявам да ги спазвате :)
+    li.action Въпроси?
+
+= slide 'Тривиа!' do
+  p Където аз задавам въпроси!
+
+= slide 'Въпрос 1' do
+  p Какво ще направи следния код?
+
+  example:
+    things = [:bacon, :cheese, :tea]
+
+    p things[1]
+    p things[10]
+
+    things[4] = :snickers
+    p things
+
+  p.action.answer
+    ' Ще отпечата <code>:chese</code>, <code>nil</code> и
+      <code>[:bacon, :chesee, :tea, nil, :snickers]</code>.
+
+= slide 'Въпрос 2' do
+  p Кое е подходящо за ключ в хеш?
+
+  p.action.answer
+    ' immutable обекти, които могат да се хешират.
+
+= slide 'Въпрос 3' do
+  p Какво ще изведе следния код:
+
+  example:
+    words = %w[foo bar baz]
+    names = words
+    names[0] << 'l'
+    names[1] = 'qux'
+    words[2] = 'larodi'
+
+    puts words
+
+  p.action.answer
+    code %w[fool qux larodi]
+
+= slide 'Въпрос 4' do
+  p Какви са методите, които завършват на <code>?</code> или <code>!</code>
+
+  p.action.answer
+    ' <code>#foo?</code> е предикат, <code>#foo!</code> е по-деструктивна версия на <code>#foo</code>
+
+= slide 'Въпрос 5' do
+  p Каква е разликата между <code>Proc</code> и <code>lambda</code>? Каква им е връзката с <code>yield</code>?
+
+  p.action.answer Дълго :)
+
+= slide 'Ruby и ООП' do
+  ul
+    li.action Всичко е обект
+    li.action Duck typing
+    li.action Няма функции, има само методи
+    li.action Няма множествено наследяване, но има mixin-и
+
+= slide 'Класове', 'прост пример' do
+  p
+    | Дефинират се с <code>class</code>. Методите, дефинирани в тялото на класа,
+      стават методи на инстанциите му. Инстанцират се се с <code>ИмеНаКласа.new</code>.
+
+  annotate:
+    class Bacon
+      def chunky?
+        'yes, of course!'
+      end
+    end
+
+    bacon = Bacon.new
+    bacon.chunky?      # =>
+
+= slide 'Класове', 'полета' do
+  p Полетата (още: instance variables) имат представка <code>@</code>.
+
+  annotate:
+    class Vector
+      def initialize(x, y)
+        @x = x
+        @y = y
+      end
+
+      def length
+        (@x * @x + @y * @y) ** 0.5
+      end
+    end
+
+    vector = Vector.new 2.0, 3.0
+    vector.length()     # =>
+    vector.length       # =>
+
+= slide 'Класове', 'полета (2)' do
+  p По подразбиране имат стойност <code>nil</code>.
+
+  example:
+    class Person
+      def heh
+        @something
+      end
+    end
+
+    person = Person.new
+    person.heh      # nil
+
+= slide 'Класове', 'викане на методи' do
+  p
+    ' В метод на може да извикате друг със <code>self.име_на_метод</code>
+      или просто <code>име_на_метод</code>:
+
+  example:
+    class Person
+      def initialize(name) @name = name                end
+      def say_hi()         puts "My name is #{@name}!" end
+      def sound_smart()    puts "1101000 1101001"      end
+
+      def talk
+        self.say_hi
+        sound_smart
+      end
+    end
+
+    mel = Person.new 'Mel'
+    mel.talk
+
+  p Такова подравняване на методи е гадно, но пък се събира в слайд
+
+= slide 'Класове', 'self' do
+  p
+    ' В методите на класа, <code>self</code> е референция към обекта,
+      на който е извикан метода. Като <code>this</code> в Java.
+
+  annotate:
+    class Person
+      def me
+        self
+      end
+    end
+
+    person = Person.new
+    person           # =>
+    person.me        # =>
+    person.me.me     # =>
+
+= slide 'Атрибути' do
+  p Полетата не са публично достъпни. Може да ги достигнете само чрез метод.
+
+  annotate:
+    class Person
+      def initialize(age)
+        @age = age
+      end
+
+      def age
+        @age
+      end
+
+      def set_age(age)
+        @age = age
+      end
+    end
+
+    person = Person.new(33)
+    person.age          # =>
+    person.set_age 20
+    person.age          # =>
+
+= slide 'Атрибути', 'setter-и' do
+  p Разбира се, <code>set_age</code> е гадно име на метод. Може и по-добре:
+
+  annotate:
+    class Person
+      def age
+        @age
+      end
+
+      def age=(value)
+        @age = value
+      end
+    end
+
+    person = Person.new
+    person.age = 33
+
+    person.age       # =>
+
+= slide 'Атрибути', 'attr_accessor' do
+  p Последното е досадно за писане. Затова:
+
+  annotate:
+    class Person
+      attr_accessor :age
+    end
+
+    person = Person.new
+    person.age = 33
+
+    person.age # =>
+
+= slide 'Атрибути', 'другите макроси' do
+  p Ако ви трябва само getter или setter, може така:
+
+  example:
+    class Person
+      attr_reader :name
+      attr_writer :grade
+      attr_accessor :age, :height
+    end
+
+= slide 'Атрибути', 'какво е attr_accessor?' do
+  p
+    ' <code>attr_accessor</code> е метод, който генерира два метода &mdash; <code>#foo</code>
+      и <code>#foo=</code>. Достъпен е в дефинициите на класове. Неформален термин за такива
+      методи е "class macro".
+  p Има ги в изобилие.
+
+= slide 'Атрибути', "Meyer's Uniform Access Principle" do
+  p Обърнете внимание, че следните два реда правят едно и също:
+
+  example:
+    person.age()
+    person.age
+
+  p
+    ' Няма разлика между достъпване на атрибут и извикване на метод, който го изчислява. Това се нарича
+      <a href="http://en.wikipedia.org/wiki/Uniform_access_principle">Uniform Access Principle</a>
+      и като цяло е хубаво нещо.
+
+= slide 'Конвенции' do
+  p В Ruby важат следните конвенции.
+
+  ul
+    li Константите се изписват с <code>UpperCamelCase</code>
+    li Методите и променливите се изписват с <code>plain_snake_case</code>
+
+= slide 'Отваряне на класове' do
+  p Във всеки момент може да отворите клас и да му добавите методи.
+
+  annotate:
+    class Person
+      def name
+        'River'
+      end
+    end
+
+    class Person
+      def say_hi
+        "Hi, I am #{name}."
+      end
+    end
+
+    Person.new.say_hi # =>
+
+= slide 'Дефиниране на метод повторно' do
+  p Ако дефинирате един метод два пъти, втората дефинира измества първата.
+
+  example:
+    class Something
+      def name
+        'Tom Baker'
+      end
+
+      def name
+        'Colin Baker'
+      end
+    end
+
+    Something.new.name # => 'Colin Baker'
+
+= slide 'alias' do
+  p Въпреки името му, <code>alias</code> прави копие на метод.
+
+  annotate:
+    class Array
+      alias old_inject inject
+
+      def inject(*args, &block)
+        puts "I see you are using #inject. Let me help!"
+        old_inject(*args, &block) * 0.01
+      end
+    end
+
+    [1, 2, 3, 4, 5, 6].inject { |a, b| a + b } # =>
+
+= slide 'Object#methods' do
+  p
+    ' Ако викнете <code>#methods</code> на нещо, ще получите масив от символи
+      с имената на методите му.
+
+  p Помните ли <code>Array#-</code>?
+  
+  annotate:
+    class Person
+      def foo() end
+      def bar() end
+    end
+
+    Person.new.methods - Object.new.methods # =>
+
+= slide 'Предефиниране на оператори' do
+  p Много интуитивно.
+
+  annotate:
+    class Vector
+      attr_accessor :x, :y
+
+      def initialize(x, y)
+        @x, @y = x, y
+      end
+
+      def +(other)
+        Vector.new(x + other.x, y + other.y)
+      end
+
+      def inspect
+        "Vector.new(#@x, #@y)"
+      end
+    end
+
+    Vector.new(1, 5) + Vector.new(3, 10) # =>
+
+= slide 'private' do
+  annotate:
+    class Person
+      def say_hi
+        "Hello! I am #{name}"
+      end
+
+      private
+
+      def name
+        'the Doctor'
+      end
+    end
+
+    person = Person.new
+    person.say_hi     # =>
+    person.name       #!
+
+= slide 'private (2)' do
+  p
+    ' Ако един метод е <code>private</code>, не може да го викате с явен recipient.
+      Дори със <code>self.</code>
+
+  annotate:
+    class Person
+      def say_hi
+        "Hello! I am #{self.name}"
+      end
+
+      private
+
+      def name
+        'the Doctor'
+      end
+    end
+
+    person = Person.new
+    person.say_hi     #!
