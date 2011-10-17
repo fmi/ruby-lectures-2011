@@ -16,7 +16,7 @@ class Lecture
   end
 
   def date
-    "#{@date.day} #{MONTHS[@date.month.succ]} #{@date.year}"
+    "#{@date.day} #{MONTHS[@date.month.pred]} #{@date.year}"
   end
 
   private
