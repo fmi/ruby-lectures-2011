@@ -2,16 +2,22 @@ require './lib/slides'
 require 'guard'
 
 class Thor::Actions::CreateFile
+  alias original_force_on_collision? force_on_collision?
+
   def force_on_collision?
-    true
+    Default.running_with_guard || original_force_on_collision?
   end
 end
 
 class Default < Thor
   include Thor::Actions
 
-  def self.source_root
-    File.dirname(__FILE__)
+  class << self
+    attr_accessor :running_with_guard
+
+    def self.source_root
+      File.dirname(__FILE__)
+    end
   end
 
   desc 'rebuild', 'Rebuilds all presentations'
@@ -28,6 +34,8 @@ class Default < Thor
 
   desc 'watch', 'Fires up guard to rebuld presentations on demand'
   def watch
+    self.class.running_with_guard = true
+
     listener = Guard::Listener.select_and_init
     listener.on_change do |files|
       files.grep(/lectures\/(\d+)-/) { lecture $1.to_i }
