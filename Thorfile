@@ -11,13 +11,10 @@ end
 
 class Default < Thor
   include Thor::Actions
+  source_root File.dirname(__FILE__)
 
   class << self
     attr_accessor :running_with_guard
-
-    def self.source_root
-      File.dirname(__FILE__)
-    end
   end
 
   desc 'rebuild', 'Rebuilds all presentations'
