@@ -35,7 +35,14 @@ class Default < Thor
 
     listener = Guard::Listener.select_and_init
     listener.on_change do |files|
-      files.grep(/lectures\/(\d+)-/) { lecture $1.to_i }
+      files.grep(/lectures\/(\d+)-/) do
+        begin
+          lecture $1.to_i
+        rescue Exception => e
+          say_status :failed, "Failed to compile: #{e.class.name}", :red
+          say e.message.gsub(/^/, "              ")
+        end
+      end
     end
     listener.start
   end
