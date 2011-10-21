@@ -1,7 +1,7 @@
 = slide 'Днес' do
   ul
     li.action Малко за ООП-то в Ruby
-    li.action Покриваме материала в широчина, на в дълбочина
+    li.action Покриваме материала в широчина, не в дълбочина
     li.action Неща от предния път: по-бавно и с повече чувство
     li.action Повече интерактивен шел
     li.action
@@ -25,7 +25,7 @@
   p Където аз задавам въпроси!
 
 = slide 'Въпрос 1' do
-  p Какво ще направи следния код?
+  p Какво ще направи следният код?
 
   example:
     things = [:bacon, :cheese, :tea]
@@ -37,8 +37,8 @@
     p things
 
   p.action.answer
-    ' Ще отпечата <code>:chese</code>, <code>nil</code> и
-      <code>[:bacon, :chesee, :tea, nil, :snickers]</code>.
+    ' Ще отпечата <code>:cheеse</code>, <code>nil</code> и
+      <code>[:bacon, :cheеse, :tea, nil, :snickers]</code>.
 
 = slide 'Въпрос 2' do
   p Кое е подходящо за ключ в хеш?
@@ -47,7 +47,7 @@
     ' immutable обекти, които могат да се хешират.
 
 = slide 'Въпрос 3' do
-  p Какво ще изведе следния код:
+  p Какво ще изведе следният код:
 
   example:
     words = %w[foo bar baz]
@@ -151,7 +151,7 @@
 = slide 'Класове', 'self' do
   p
     ' В методите на класа, <code>self</code> е референция към обекта,
-      на който е извикан метода. Като <code>this</code> в Java.
+      на който е извикан методът. Като <code>this</code> в Java.
 
   annotate:
     class Person
@@ -203,7 +203,7 @@
     end
 
     person = Person.new
-    person.age = 33
+    person.age = 33  # Същото като person.age=(33)
 
     person.age       # =>
 
@@ -256,8 +256,8 @@
     li Константите се изписват с <code>UpperCamelCase</code>
     li Методите и променливите се изписват с <code>plain_snake_case</code>
 
-= slide 'Отваряне на класове' do
-  p Във всеки момент може да отворите клас и да му добавите методи.
+= slide '"Отваряне" на класове' do
+  p Във всеки момент може да "отворите" клас и да му добавите методи.
 
   annotate:
     class Person
@@ -273,9 +273,10 @@
     end
 
     Person.new.say_hi # =>
+    Person.new.name   # =>
 
-= slide 'Дефиниране на метод повторно' do
-  p Ако дефинирате един метод два пъти, втората дефинира измества първата.
+= slide 'Повторно дефиниране на метод' do
+  p Ако дефинирате един метод два пъти, втората дефиниция измества първата.
 
   example:
     class Something
@@ -291,7 +292,7 @@
     Something.new.name # => 'Colin Baker'
 
 = slide 'alias' do
-  p Въпреки името му, <code>alias</code> прави копие на метод.
+  p Въпреки името си, <code>alias</code> прави копие на метод.
 
   annotate:
     class Array
@@ -311,7 +312,7 @@
       с имената на методите му.
 
   p Помните ли <code>Array#-</code>?
-  
+
   annotate:
     class Person
       def foo() end
@@ -362,7 +363,7 @@
 
 = slide 'private (2)' do
   p
-    ' Ако един метод е <code>private</code>, не може да го викате с явен recipient.
+    ' Ако един метод е <code>private</code>, не може да го викате с явен получател.
       Дори със <code>self.</code>
 
   annotate:
