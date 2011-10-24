@@ -1,0 +1,628 @@
+= slide 'Тази седмица' do
+  ul
+    li.action Enumerable
+    li.action Наследяване
+    li.action Модули
+    li.action Именовани пространства
+    li.action Ред дребни неща
+
+= slide 'Въпрос 1' do
+  p Какво прави <code>alias</code>?
+
+  example:
+    class Something
+      def name() 'baba' end
+      alias relative name
+      def name() 'dyado' end
+    end
+
+    p Something.new.relative
+
+  p.action.answer Прави копие на метода
+
+= slide 'Въпрос 2' do
+  p Кой (и как) може да вика <code>private</code> методи?
+
+  example:
+    class Something
+      private
+
+      def foo
+      end
+    end
+
+  .action.answer
+    ul
+      li Могат да се викат от други методи на обекта
+      li Могат да се видат от методи в наследници
+      li Не могат да се викат с явен target (<code>self.foo</code>)
+
+= slide 'Въпрос 3' do
+  p На какво могат да завършваш методите в Ruby?
+
+  .action.answer
+    ul
+      li На <code>?</code> ако са предикати
+      li На <code>!</code> ако имат две версии
+      li На <code>=</code> ако са setter
+
+= slide 'Въпрос 4' do
+  p Какви са конвенциите за имена на методи, променливи, константи и имена на класове?
+
+  .action.answer
+    ul
+      li UpperCamelCase - константи (включва имена на класове)
+      li normal_snake_case - променвили, методи
+
+= slide 'Втора задача' do
+  ul
+    li.action Можете да я намерите <a href="http://fmi.ruby.bg/tasks/2">на сайта</a>.
+    li.action Ще има ограничения
+    li.action Най-много 3 нива на влагане
+    li.action Най-много 12 реда в метод
+    li.action Най-много 10 метода в клас
+    li.action Без <code>;</code>
+
+= slide 'GitHub repo-та', 'свързани с курса' do
+  p Следните хранилища може да са ви интересни
+  ul
+    li.action #{github_repo('skanev/evans')} &mdash; сайт на курса
+    li.action #{github_repo('skanev/skeptic')} &mdash; проверка на стила
+    li.action #{github_repo('fmi/ruby-lectures')} &mdash; лекции
+    li.action #{github_repo('fmi/ruby-homework')} &mdash; домашни, тестове и решения
+
+= slide 'Какво да правим с GitHub хранилищата?' do
+  p Някои от възможните интеракции:
+  ul
+    li.action Четене на Ruby код, for fun and profit
+    li.action Оправяне на грешки в презентации и условия
+    li.action Отваряне на issue-та
+    li.action Pull request-и от всякакъв вид
+    li.action Полезните неща получават точки
+
+= slide 'Решения на първа задача' do
+  p Ще разгледаме:
+  ul
+    li.action Някои често срещани грешки
+    li.action Ще има съвети и хейт
+    li.action Съвети са за неща, които няма как да знаете
+    li.action Хейта ще е за неща, които трябва да знаете
+    li.action Вашите решения
+    li.action Как бих я решил аз
+    li.action Преди това: колко от вас предадоха първа задача?
+
+= slide 'Грешки', 'Array#flatten' do
+  annotate:
+    class Array
+      def to_hash
+        Hash[*self.flatten]
+      end
+    end
+
+    [[1, [2, 3]], [4, [5, 6]]].to_hash # =>
+
+  p Ако някой от елементите е масив, номера няма да мине
+
+= slide 'Грешки', 'for' do
+  example:
+    def to_hash
+      result = Hash.new
+      for i in 0...self.size
+        result[self[i][0]] = self[i][1]
+      end
+      result
+    end
+
+  p Не ползвайте <code>for</code> - остаряла форма е и вътрешно вика <code>#each</code>.
+  p.action <code>Hash.new</code> е глупав начин да напишеше <code>{}</code>
+  p.action <code>self.each do |key, value|</code> щеше да е напълно достатъчен
+
+= slide 'Грешки', 'идентация' do
+  example:
+    class Array
+        def occurences_count
+            res = Hash.new(0)
+            self.map { |elem| res[elem] += 1 }
+            res
+        end
+    end
+
+  ul
+    li Ruby се идентира с 2 интервала.
+    li Лошо идентирания код е мърлява работа.
+    li Започвам да вземам точки за това.
+
+= slide 'Грешки', 'идентация пак' do
+  p Някои от вас смесват табулации и интервали:
+
+  ul
+    li
+      a href="http://fmi.ruby.bg/tasks/1/solutions/21" Първи пример
+    li
+      a href="http://fmi.ruby.bg/tasks/1/solutions/67" Втори пример
+    li
+      a href="http://fmi.ruby.bg/tasks/1/solutions/36" Трети пример
+    li
+      a href="http://fmi.ruby.bg/tasks/1/solutions/53" Четвърти пример
+
+  p Накратко, научете се как да ползвате редакторите си.
+
+= slide 'Грешки', 'цикли' do
+  example:
+    class Array
+      def index_by
+        h=Hash.new
+        while not(self.empty?)
+          x=self.first
+          h[yield x]=x
+          self.shift
+        end
+        puts h
+      end
+    end
+
+  ul
+    li <code>while</code> и <code>until</code> се ползват <strong>много</strong> рядко в Ruby.
+    li Имат смисъл само когато броя итерации е неограничен
+    li Впрочем, тук whitespace-а е ужасен
+
+= slide 'Грешки', 'кратки имена' do
+  example:
+    def to_hash
+      res = {}
+      self.each do |v|
+        res[v[0]] = v[1]
+      end
+      res
+    end
+
+  ul
+    li <code>res</code>? <code>v</code>? wtf?
+    li Не съкращавайте имена - трудно се помно кое съкращение ползвате.
+    li Избягвайте променливи с една буква. Правя го в слайдовете за да пестя място.
+
+= slide 'Грешки', 'криптични имена' do
+  example:
+    def subarray_count(subarray)
+      raise ArgumentException if subarray.empty?
+      to_return = 0
+      victim = self.dup
+      while victim.length >= subarray.length do
+        to_return += 1  if victim.first(subarray.length) == subarray
+        victim.shift
+      end
+      to_return
+    end
+
+  p <code>victim</code>? Наистина?
+
+= slide 'Грешки', 'много код' do
+  example:
+    def subarray_count(subarray)
+      result = 0
+      for i in 0...size
+        fail = 0
+        for j in 0...subarray.size
+          unless self[i+j] == subarray[j]
+            fail = 1
+          end
+        end
+        unless fail == 1
+          result += 1 
+        end
+      end
+      result
+    end
+
+  p Това не е Ruby програма. Това е C програма. При това - крива.
+
+= slide 'Грешки', '#inject за хешове' do
+  example:
+    class Array
+      def to_hash
+        self.inject({}) { |k, v| k[v[0]] = v[1]; k }
+      end
+    
+      def index_by
+        self.inject({}) { |k, v| k.merge!(yield(v) => v) }
+      end
+    end
+  
+  p Избягвайте да мутира аргумента на <code>#inject</code>
+  p Тук <code>#merge!</code> няма работа
+
+= slide 'Грешки', 'странни скоби' do
+  example:
+    class Array
+      def index_by(&block)
+        ((map &block).zip self).to_hash
+      end
+    end
+
+  p Имаш предвид <code>map(&block).zip(self).to_hash</code> ?
+  p Впрочем, хитро решение
+
+= slide 'Object#tap' do
+  p <code>Object#tap</code> извиква блока със себе си и връща обекта, на който е извикан.
+
+  annotate:
+    array = [].tap do |items|
+      items              # =>
+      items.equal? array # =>
+
+      items << 'foo'
+      'other thing'
+    end
+
+    array                # =>
+
+= slide 'Object#tap', 'за debug-ване' do
+  p Имате следния код
+  example:
+    (1..10).select { |x| x.odd? }.map { |x| x ** 2 }
+
+  p Искате да видите какво остава след <code>select</code>-а:
+  example:
+    (1..10).select { |x| x.odd? }.tap { |x| p x }.map { |x| x ** 2 }
+
+= slide 'Object#tap', 'в Array#occurences_count от първа задача' do
+  example:
+    class Array
+      def occurences_count
+        Hash.new(0).tap do |result|
+          each { |item| result[item] += 1 }
+        end
+      end
+    end
+
+= slide 'Symbol#to_proc' do
+  p Следните два реда са (почти) еквивалентни:
+
+  example:
+    name = ->(object) { object.name }
+    name = :name.to_proc
+
+  .action
+    p
+      ' Когато подавате блок на метод с <code>&block</code>, Ruby извиква
+        <code>#to_proc</code>, ако <code>block</code> не е метод.
+
+  .action
+    p Съответно, следните два реда са еквивалентни
+    annotate:
+      %w[foo plugh larodi].map { |s| s.length } # =>
+      %w[foo plugh larodi].map(&:length)        # =>
+
+= slide 'Symbol#to_proc', 'с повече от един аргумент' do
+  p Всъщност, малко по сложно е:
+  example:
+    block = ->(obj, *args) { obj.method_name *args }
+    block = :method_name.to_proc
+
+  .action
+    p Това значи, че може да направите така:
+    annotate:
+      [{a: 1}, {b: 2}, {c: 3}].inject { |a, b| a.merge b } # =>
+      [{a: 1}, {b: 2}, {c: 3}].inject(&:merge)             # =>
+
+  .action
+    p Или дори:
+    annotate:
+      [1, 2, 3, 4].inject { |a, b| a + b } # =>
+      [1, 2, 3, 4].inject(&:+)             # =>
+
+= slide 'pry', '$ gem install pry' do
+  ul
+    li.action По-як шел
+    li.action Highlighting
+    li.action Удобно инспектиране
+    li.action Помага за редактиране на грешки
+    li.action Показва документация
+    li.action Показва код на метод
+    li.action
+      a href="http://pry.github.com" pry.github.com
+
+= slide 'Модули' do
+  p Модулите в Ruby имат няколко предназначения:
+
+  ul
+    li Именовани пространства,
+    li Съдържане на "не-instance" методи
+    li Mixins
+
+  p Днес ще разгледаме последното.
+
+= slide 'Модули', 'като колекция от методи' do
+  p Модулите в Ruby просто съдържат методи. Дефинират се подобно на класове:
+
+  example:
+    module UselessStuff
+      def almost_pi
+        3.1415
+      end
+      
+      def almost_e
+        2.71
+      end
+    end
+
+= slide 'Модули', 'миксиране' do
+  p
+    ' Модулите могат да се "миксират" с клас. Тогава той получава всички методи
+      на модула като instance методи.
+  
+  annotate:
+    module UselessStuff
+      def almost_pi
+        3.1415
+      end
+    end
+
+    class Something
+      include UselessStuff
+    end
+
+    Something.new.almost_pi # =>
+
+= slide 'Модули', 'self' do
+  p
+    ' В метод на модула, <code>self</code> е инстанцията, на която е извикан.
+
+  annotate:
+    module Introducable
+      def introduction
+        "Hello, I am #{name}"
+      end
+    end
+
+    class Person
+      include Introducable
+      def name() 'The Doctor' end
+    end
+
+    doctor = Person.new
+    doctor.introduction # =>
+
+= slide 'Модули', 'приоритет на методите' do
+  p Методите на класа имат приоритет пред методите на модула.
+
+  annotate:
+    module Includeable
+      def name() 'Module' end
+    end
+
+    class Something
+      def name() 'Class' end
+      include Includeable
+    end
+
+    Something.new.name # =>
+
+= slide 'Модули', 'приоритет на методите (2)' do
+  p Ако два модула дефинират един и същи метод, ползва се последния:
+
+  annotate:
+    module Chunky
+      def name() 'chunky' end
+    end
+
+    module Bacon
+      def name() 'bacon' end
+    end
+
+    class Something
+      include Chunky
+      include Bacon
+    end
+
+    Something.new.name # =>
+
+= slide 'Модули', 'приоритет на методите (3)' do
+  p Просто за информация: методите на mixin-ите имат приоритет пред тези на родителя.
+  p
+    ' Всичко това е свързано с нещо, наречено <em>ancestor chain</em>, за което
+      ще си говорим следващия път.
+
+= slide 'Enumerable' do
+  ul
+    li.action Най-важния модул в Ruby
+    li.action Дава много полезни методи за обработка на масиви
+    li.action Ползва се постоянно
+    li.action
+      a href='http://apidock.com/ruby/Enumerable' APIDock страница
+
+= slide '#collect, #select и #inject' do
+  p Помните ли тези методи?
+
+  annotate:
+    [1, 2, 3, 4, 5].select(&:odd?)     # =>
+    %w[foo plugh barney].map(&:length) # =>
+    [1, 2, 3, 4, 5].inject(&:*)        # =>
+
+  .action
+    p Те са имплементирани в <code>Enumerable</code>, а не в Array.
+    p Всяка колекция в Ruby ги има.
+
+= slide 'Други методи на Enumerable' do
+  pre
+    ' all?          any?        chunk       collect          collect_concat
+      count         cycle       detect      drop             drop_while
+      each_cons     each_entry  each_slice  each_with_index  each_with_object
+      entries       find        find_all    find_index       first
+      flat_map      grep        group_by    include?         inject
+      map           max         max_by      member?          min
+      min_by        minmax      minmax_by   none?            one?
+      partition     reduce      reject      reverse_each     select
+      slice_before  sort        sort_by     take             take_while
+      to_a          zip
+
+  p После ще видите как генерирах тази таблица.
+
+= slide 'Hash < Enumerable', do
+  p Хешовете също са <code>Enumerable</code>:
+
+  annotate:
+    hash = {2 => 3, 4 => 5}
+
+    hash.to_a                                 # =>
+    hash.map { |p| p[0] + p[1] }              # =>
+    hash.map { |k, v| k + v }                 # =>
+    hash.inject(0) { |s, p| s + p[0] * p[1] } # =>
+
+= slide 'Hash < Enumerable', 'бележка под линия' do
+  p Някои от <code>Enumerable</code> методите в <code>Hash</code> са предефинирани
+
+  annotate:
+
+    hash = {2 => 3, 4 => 5, 6 => 7, 8 => 9}
+
+    hash.select { |k, v| v > 6 }      # =>
+    hash.to_a.select { |k, v| v > 6 } # =>
+
+  p <code>Enumerable#select</code> връща списък, но <code>Hash#select</code> връща Hash.
+
+= slide '#all? и #any?' do
+  p
+    ' <code>#all?</code>/<code>#any?</code> връщат истина ако всички/един елемент(и) от
+      колекцията отговарят на някакво условие
+
+  annotate:
+    [1, 2, 3, 4].all? { |x| x.even? } # =>
+    [1, 2, 3, 4].any? { |x| x.even? } # =>
+
+    [2, 4, 6, 8].all? { |x| x.even? } # =>
+    [2, 4, 6, 8].any? { |x| x.odd? }  # =>
+
+    # И разбира се:
+    [1, 2, 3, 4].any?(&:even?)        # =>
+
+= slide '#each_with_index' do
+  p <code>#each_with_index</code> yield-ва всеки елемент с индекса му в масива
+
+  example:
+    %w[foo bar baz].each_with_index do |word, index|
+      puts "#{index}. #{word}"
+    end
+
+  p Извежда:
+
+  pre
+    ' 0. foo
+      1. bar
+      2. baz
+
+= slide '#group_by' do
+  p Името казва всичко, което ви е нужно да знаете
+
+  annotate:
+    hash   = %w[foo bar plugh larodi]
+    groups = hash.group_by { |word| word.length }
+
+    groups # =>
+
+= slide '#each_slice' do
+  p <code>#each_slice(n)</code> <code>yield</code>-ва елементите на части по <code>n</code>:
+
+  example:
+    %w[a b c d e f g h].each_slice(3) do |slice|
+      p slice
+    end
+
+  p Извежда
+  pre
+    ' ["a", "b", "c"]
+      ["d", "e", "f"]
+      ["g", "h"]
+
+= slide '#each_cons' do
+  p <code>#each_cons(n)</code> <code>yield</code> "подмасиви" с <code>n</code> елемента
+
+  example:
+    [1, 2, 3, 4, 5].each_cons(3) do |cons|
+      p cons
+    end
+
+  p Извежда
+  pre
+    ' [1, 2, 3]
+      [2, 3, 4]
+      [3, 4, 5]
+
+= slide '#include? и #member?' do
+  p Вече знаете какво прави
+
+  annotate:
+    [1, 2, 3, 4].include? 3   # =>
+    [1, 2, 3, 4].member? 5    # =>
+
+  p Двете са синоними
+
+= slide '#zip' do
+  annotate:
+    [1, 2, 3].zip([4, 5, 6])    # =>
+    [1, 2].zip([3, 4], [5, 6])  # =>
+ 
+= slide '#one? и #none?' do
+  p Като <code>#all?</code> и <code>#any?</code>, но в други случаи
+
+  annotate:
+    %w[foo bar larodi].one? { |word| word.length == 6 }  # =>
+    %w[foo bar larodi].one? { |word| word.length == 3 }  # =>
+
+    [1, 5, 3].none? { |number| number.even? }   # =>
+    [1, 2, 3].none? { |number| number.even? }   # =>
+
+= slide '#take, #drop, #take_while и #drop_while' do
+  annotate:
+    [1, 2, 3, 4, 5].take(2)  # =>
+    [1, 2, 3, 4, 5].drop(2)  # =>
+
+    [1, 3, 5, 6, 7, 9].take_while(&:odd?)  # =>
+    [1, 3, 5, 6, 7, 9].drop_while(&:odd?) # =>
+
+= slide 'pry', '$ gem install pry' do
+  ul
+    li.action По-як шел
+
+= slide 'Как генерирах таблицата с методите?' do
+  pre
+    ' all?          any?        chunk       collect          collect_concat
+      count         cycle       detect      drop             drop_while
+      each_cons     each_entry  each_slice  each_with_index  each_with_object
+      entries       find        find_all    find_index       first
+      flat_map      grep        group_by    include?         inject
+      map           max         max_by      member?          min
+      min_by        minmax      minmax_by   none?            one?
+      partition     reduce      reject      reverse_each     select
+      slice_before  sort        sort_by     take             take_while
+      to_a          zip
+
+= slide 'Как генерирах таблицата с методите?', 'кодът' do
+  example:
+    Enumerable.instance_methods.
+      sort.
+      map { |name| sprintf '%-016s', name }.
+      each_slice(5) { |row| puts row.join '' } 
+
+  p.action
+    em Disclaimer: Леко редактирах whitespace-а за да се събере в слайд
+
+= slide 'include Enumerable', 'или как да го ползваме за наши класове' do
+  p Трябва да дефинирате <code>#each</code>.
+  p Той ви дава всичко останало.
+
+= slide 'include Enumerable', 'пример' do
+  annotate:
+    class StepRange
+      include Enumerable
+
+      def initialize(first, last, step)
+        @first, @last, @step = first, last, step
+      end
+
+      def each
+        @first.step(@last, @step) { |n| yield n }
+      end
+    end
+
+    StepRange.new(1, 10, 2).select { |n| n > 5 } # =>
