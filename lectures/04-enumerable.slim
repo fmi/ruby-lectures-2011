@@ -601,7 +601,7 @@
   example:
     Enumerable.instance_methods.
       sort.
-      map { |name| sprintf '%-016s', name }.
+      map { |name| name.to_s.rjust(16) }.
       each_slice(5) { |row| puts row.join '' } 
 
   p.action
