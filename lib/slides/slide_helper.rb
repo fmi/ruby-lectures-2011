@@ -14,5 +14,9 @@ class SlideHelper
     output << "</section>\n"
     output
   end
+
+  def github_repo(repo)
+    %{<a href="http://github.com/#{repo}">#{repo}</a>}
+  end
 end
 
