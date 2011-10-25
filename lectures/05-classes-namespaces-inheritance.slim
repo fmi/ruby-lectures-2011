@@ -360,7 +360,7 @@
     thing.answer           #!
     Something.answer       # =>
 
-    something.do_stuff
+    thing.do_stuff
 
 = slide 'Класови методи (3)' do
   p Не са достъпни и в наследниците
@@ -370,14 +370,14 @@
       def Base.answer() 42 end
     end
 
-    class Derived
+    class Derived < Base
       def Derived.say_answer
-        answer         #!
+        answer         # =>
         Base.answer    # =>
       end
     end
 
-    Derived.answer     #!
+    Derived.answer     # =>
     Base.answer        # =>
 
     Derived.say_answer
