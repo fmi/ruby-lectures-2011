@@ -167,6 +167,29 @@
 
     Thing.ancestors # =>
 
+= slide 'Разговор с Пешо' do
+  annotate:
+  module TalksWIthPesho
+    def say_hi_pesho() puts "Hello, #{pesho}" end
+  end
+
+  class Base
+    include TalksWIthPesho
+    def pesho()       'Base Pesho' end
+    def say_hi_base() say_hi_pesho end
+  end
+
+  class Derived < Base
+    include TalksWIthPesho
+    def pesho()          'Derived Pesho' end
+    def say_hi_derived() say_hi_pesho    end
+  end
+
+  d = Derived.new # =>
+  d.say_hi_base # =>
+  d.say_hi_derived # =>
+
+
 = slide 'Основните класове в Ruby' do
   list:
     Всичко наследява от `Object`
