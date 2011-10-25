@@ -167,27 +167,29 @@
 
     Thing.ancestors # =>
 
-= slide 'Разговор с Пешо' do
+= slide 'Ancestor chain (4)' do
+  p Има само една версия на метода:
+
   annotate:
-    module TalksWIthPesho
-      def say_hi_pesho() puts "Hello, #{pesho}" end
+    module Talking
+      def greeting() "Hello, #{name}" end
     end
 
     class Base
-      include TalksWIthPesho
-      def pesho()       'Base Pesho' end
-      def say_hi_base() say_hi_pesho end
+      include Talking
+      def name()        'Base'   end
+      def say_hi_base() greeting end
     end
 
     class Derived < Base
-      include TalksWIthPesho
-      def pesho()          'Derived Pesho' end
-      def say_hi_derived() say_hi_pesho    end
+      include Talking
+      def name()           'Derived' end
+      def say_hi_derived() greeting  end
     end
 
-    d = Derived.new # =>
-    d.say_hi_base # =>
-    d.say_hi_derived # =>
+    derived = Derived.new
+    derived.say_hi_base    # =>
+    derived.say_hi_derived # =>
 
 = slide 'Основните класове в Ruby' do
   list:
