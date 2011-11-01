@@ -62,12 +62,12 @@ body{ background:#f5f6f6; }
 #deck p,
 #deck li,
 #deck table th,
+#deck blockquote,
 #deck table td { font-family: Arial; font-size:20px; text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.8); }
 #deck code { font-family: Monaco; }
 #deck pre { margin-bottom: 1em; }
 #deck kbd { font-family: Monaco; }
 #deck section:first-child hgroup { text-align: center; padding-top: 100px !important; }
-
 
 #deck table { border-collapse: collapse; margin-bottom: 2em; }
 #deck table th { background-color: #dddddd; }
@@ -76,3 +76,4 @@ body{ background:#f5f6f6; }
 #deck ul,
 #deck ol { margin-bottom: 2em; }
 #deck .answer { color: #6a6; font-style: italic; }
+#deck blockquote { font-style: italic; }

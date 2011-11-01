@@ -1,0 +1,703 @@
+= slide 'Днес' do
+  list:
+    Весела коледа! (31 oct = 25 dec).
+    Ще разгледаме решенията ви на втора задача.
+    Първия SOLID принцип.
+    Code smells.
+
+= slide 'Трета задача' do
+  list:
+    Публикувана е.
+    По-трудна е от предишните две.
+    Започнете да я решавате скоро.
+    Няма да стават по-лесни.
+
+= slide 'Трета задача', 'малко особености' do
+  list:
+    Споделяме (почти) пълния тест, с който ще тестваме.
+    Ще напишем по-подробни подсказки как да я реализирате.
+    Точните ограничения не са решение още, но има предварителни.
+    2 нива на влагане.
+    8 реда на метод.
+    10 метода в клас.
+
+= slide 'Втора задача' do
+  list:
+    Оценки по-късно през седмицата.
+    Бонус точки за добър стил.
+    Вземаме точки за лош.
+    Постепенно ще коментираме всички решения.
+    Предавайте задачи по-рано да получите feedback.
+
+
+= slide 'Грешка #0', 'Типичните' do
+  ul
+    li Не сте си пуснали примерния тест
+    li Не сте си прочели условието
+    li Не сте погледнали подсказките
+    li Предавате решения в последния момент
+
+= slide 'Грешка #1', 'Не ползва Enumerable' do
+  example:
+    @collection = []
+
+    songs.each do |name, artist, genres_string, tags_string|
+      genre, subgenre = genres_string.split(/,\s*/)
+      tags = artist_tags.fetch(artist, [])
+      tags += [genre, subgenre].reject(&:nil?).map(&:downcase)
+      tags += tags_string.split(/,\s*/) unless tags_string.nil?
+
+      @collection << Song.new(name, artist, genre, subgenre, tags)
+    end
+
+  p Ползва <code>#each</code> вместо <code>#map</code>
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/76" Източник
+
+= slide 'Грешка #1' do
+  p Всеки път, когато тръгнете да пишете:
+
+  example:
+    somethings = []
+
+    things.each do |thing|
+      ...
+      somethings << modified_thing
+    end
+
+  p Всъщност имате предвид:
+
+  example:
+    somethings = things.map do |thing|
+      ...
+    end
+
+  blockquote
+    | "Всеки не-функционален #each е пирон в ковчега на капитализма."
+
+= slide 'Грешка #2', 'лошо подравнен код' do
+  example:
+    def matchCriteria(criteria)
+      name? criteria[:name] and
+      artist? criteria[:artist] and
+      tags? criteria[:tags] and
+      filter? criteria[:filter] and
+      true
+    end
+
+  list:
+    `matchCriteria` не е по конвенция.
+    Изглежда като пет отделни израза, а всъщност е един.
+    Изглежда че връща `true`
+    Впрочем, `and true`?
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/94" Източник
+
+= slide 'Грешка #2' do
+  p По-правилно подравняване:
+
+  example:
+    def matchCriteria(criteria)
+      name? criteria[:name] and
+        artist? criteria[:artist] and
+        tags? criteria[:tags] and
+        filter? criteria[:filter]
+    end
+
+  p <code>name?</code>, <code>artist?</code> и прочее не са добри имена.
+
+= slide 'Грешка #3', 'Не гледате подсказките' do
+  example:
+    all_tags = tags.kind_of?(String) ? [tags] : tags
+
+  p Всъщност искате да напишете:
+
+  example:
+    all_tags = Array(tags)
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/94" Източник
+
+= slide 'грешка #4', 'много повторение' do
+  example:
+    def parse_single_song(song_as_string, artist_tags)
+      attributes = song_as_string.split('.')
+      name = attributes[0].strip
+      artist = attributes[1].strip
+      genre = attributes[2].split(',')[0].strip
+      subgenre = attributes[2].split(',').fetch(1,'').strip
+      tags = attributes.fetch(3, '').split(',').map{|attr| attr.strip}
+      additional_tags = artist_tags.fetch(artist, [])
+      Song.new(name, artist, genre, subgenre, tags|additional_tags)
+    end
+
+  p
+    | Тук всякаш има твърде много, твърде сбит код. Някои елементи в него се
+    | повтарят визуално (<code>attributes[x].strip</code> например)
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/95" Източник
+
+= slide 'Грешка #4', 'Много повторение' do
+  p Ето как може да стане по-кратко:
+
+  example:
+    def parse_single_song(song_as_string, artist_tags)
+      name, artist, genres, tags = song_string.split('.').map(&:strip)
+      genre, subgenre            = genres.split(',').map(&:strip)
+      tags                       = tags.split(',').map(&:strip)
+
+      tags += additional_tags[artist] if additional_tags.has_key? artist
+
+      Song.new name, artist, genre, subgenre
+    end
+
+= slide 'DRY', "Don't Repeat Yourself" do
+  p Просто правило: Не повтаряйте информация в кода си.
+
+  p
+    | Всеки път, когато откриете повторение в кода си, намирайте начин да го елиминирате.
+      Това е най-лесния начин да се научите да пишете добър код.
+
+= slide 'Грешка #5', 'Странно разбиване на методи' do
+  example:
+    def matches?(criteria)
+      if (criteria[:name] != nil) and (check_name(criteria[:name]) == false)
+        return false
+      end
+      if (criteria[:artist] != nil) and (check_artist(criteria[:artist]) == false)
+        return false
+      end
+      # ...
+      true
+    end
+    
+    def check_name(name)
+      @name.eql?(name)
+    end
+    
+    def check_artist(artist)
+      @artist.eql?(artist)
+    end
+
+  p Границата между <code>matches?</code> и <code>check_xxx</code> е странна.
+
+  p
+    | По-добре или проверката за <code>nil</code> да се изнесе в <code>check_xxx</code> методите,
+      или да се inline-нат в <code>matches?</code>
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/89" Източник
+
+= slide 'Грешка #5', 'Странно разбиване на методи' do
+  p Отделно:
+
+  example:
+    def matches?(criteria)
+      if (criteria[:name] != nil) and (check_name(criteria[:name]) == false)
+        return false
+      end
+      # ...
+      true
+    end
+    
+    def check_name(name)
+      @name.eql?(name)
+    end
+
+  list:
+    `criteria[:name]` вместо `criteria[:name] != nil`
+    `not check_name(criteria[:name])` вместо `check_name(criteria[:name]) == false`
+    Какво прави `Object#eql?`
+
+= slide '#eql?' do
+  p Как обектите ни да бъдат ключове в хеш? Може да пробваме така, но няма да сработи:
+
+  annotate:
+    class Cell
+      attr_reader :x, :y
+
+      def initialize(x, y)
+        @x, @y = x, y
+      end
+
+      def hash
+        [@x, @y].hash
+      end
+
+      def ==(other)
+        other.is_a?(Cell) and x == other.x and y == other.y
+      end
+    end
+
+    board = {Cell.new(0, 0) => true, Cell.new(0, 1) => true, Cell.new(0, 2) => true}
+    Cell.new(0, 0) == Cell.new(0, 0) # =>
+    board[Cell.new(0, 0)]            # =>
+
+
+= slide '#eql? (2)' do
+  p Правилния начин:
+
+  annotate:
+    class Cell
+      attr_reader :x, :y
+
+      def initialize(x, y)
+        @x, @y = x, y
+      end
+
+      def hash
+        [@x, @y].hash
+      end
+
+      def eql?(other)
+        other.is_a?(Cell) and x == other.x and y == other.y
+      end
+    end
+
+    board = {Cell.new(0, 0) => true, Cell.new(0, 1) => true, Cell.new(0, 2) => true}
+    board[Cell.new(0, 0)] # =>
+
+= slide '#eql? (3)' do
+  list:
+    Трябва да дефинирате `#eql?`
+    Обикновено се прави така: `alias eql? ==`
+    Трябва да предефинирате `#hash` по стандартния начин.
+    Стандартния начин беше: <code>a.eql?(b)</code> → <code>a.hash == b.hash</code>
+    Стрелката значи импликация.
+  
+= slide 'Грешка #6', 'Array() отново' do
+  example:
+    def check_tags(tags)
+      if (tags.kind_of?(String))
+        check_tag(tags)
+      else
+        tags.all? {|tag| check_tag(tag)}
+      end
+    end
+
+  p Всъщност:
+
+  example:
+    def check_tags(tags)
+      Array(tags).all? { |tag| check_tag(tag) }
+    end
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/89" Източник
+
+= slide 'Грешка #7', 'Enumerable отново' do
+  example:
+    def matches_criteria?(criteria_hash)
+      criteria_hash.each do |attribute, value|
+        return false unless matches_criterion? attribute, value
+      end
+      true
+    end
+
+  p Всъщност:
+
+  example:
+    def matches_criteria?(criteria)
+      criteria.all? { |attribute, value| matches_criterion? attribute, value }
+    end
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/78" Източник
+
+= slide 'Грешка #7', 'Enumerable отново (2)' do
+  p Всяко:
+
+  example:
+    things.each do |thing|
+      return false unless condition?(thing)
+    end
+    true
+
+  p Всъщност е:
+
+  example:
+    things.all? { |thing| condition?(thing) }
+
+  p
+    | Аналогично за <code>#any?</code> ако се разменят <code>true</code> и
+      <code>false</code> и <code>unless</code> стане </code>if</code>.
+
+= slide 'Не ползвате Enumerable' do
+  list:
+    Отново: `Enumerable` е критичен за Ruby.
+    Дава ви много удобства, с които да пишете по-малко.
+    По-важното: прави кода по-ясен.
+    В горния пример, `#all?` е по-ясен от `#each`.
+    Всеки пропуск да ползвате `#map`, `#select`, `#any?`, и `#inject` и прочее е лош стил.
+
+= slide 'Грешка #8', 'Гаден whitespace' do
+  example:
+    @tags = song_hash[:tags].map!{|tag| tag.strip}
+    tags.select { |tag| not tag.end_with?'!' }.all?{ |tag| @tags.include?tag }
+    pairs = [ :name, :artist, :genre_subgenre, :tags ].zip(values)
+
+  p Whitespace-а се поставя така:
+
+  example:
+    @tags = song_hash[:tags].map! { |tag| tag.strip }
+    tags.select { |tag| not tag.end_with? '!' }.all? { |tag| @tags.include? tag }
+    pairs = [:name, :artist, :genre_subgenre, :tags].zip(values)
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/78" Източник
+
+= slide 'Грешка #9', 'Мутиращи операции' do
+  example:
+    @tags = song_hash[:tags].map! { |tag| tag.strip }
+
+  p.action <code>#map!</code> е глупаво, Евгени. Какво си пушил, докато си го писал?
+
+  .action
+    p По добре ще стане така:
+
+    example:
+      @tags = song_hash[:tags].map { |tag| tag.strip }
+      @tags = song_hash[:tags].map(&:strip)
+
+    a href="http://fmi.ruby.bg/tasks/2/solutions/78" Източник
+
+= slide 'Грешка #9', 'Мутиращи операции' do
+  example:
+    @tags = song_hash[:tags].map! { |tag| tag.strip }
+
+  p Какви проблеми виждам:
+
+  list:
+    Мутира параматър на `Collection.find`.
+    Не е ясно дали клиента го очаква.
+    Не е ясно дали клиента зависи от това поведение.
+    Ако едно от двете е вярно, може `!`-та да не се забележи.
+    Ако нито едно не е вярно, `!`-та е объркваща.
+    Сериозно, как ти хрумна?
+
+= slide 'Mutable vs. Immutable' do
+  list:
+    Промяната на състоянието е най-лесния начин да усложните код.
+    Когато един код мутира разни работи се превръща от декларативен в императивен.
+    Вместо да го четете, трябва да го <strong>интерпретирате</strong>.
+    Трябва да се правите на интерпретатор, демек.
+    Функционалните езици си дават доста зор да минимизират мутацията.
+
+= slide 'Грешка #10', 'Странни имена на методи' do
+  example:
+    def self.fix_hash(song_hash, artist_tags)
+        song_hash[:genre_subgenre] = song_hash[:genre_subgenre].split /\s*,\s*/
+        song_hash[:genre], song_hash[:subgenre] = song_hash[:genre_subgenre]
+        song_hash[:tags] = song_hash[:tags] ? song_hash[:tags].split(',') : []
+        song_hash[:tags] << song_hash[:genre].downcase if song_hash[:genre]
+        song_hash[:tags] << song_hash[:subgenre].downcase if song_hash[:subgenre]
+        song_hash[:tags] += (artist_tags[song_hash[:artist]] or [])
+        song_hash
+    end
+
+  p fix? Какво му е счупеното?
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/78" Източник
+
+= slide 'Грешка #11', 'Страннен синтаксис' do
+  example:
+    def check_tag?(tag)
+      if tag.end_with? '!' then
+        return false if @tags.include? tag.chop
+      else
+        return false unless @tags.include? tag
+      end
+
+      return true
+    end
+
+  p <code>then</code>-а в този <code>if</code> е излишен
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/83" Източник
+
+= slide 'Грешка #12', 'Лоша проверка за тип' do
+  example:
+    def filter_by_tags(songs, tags)
+      if tags.class == String then
+        songs.select { |song| song.check_tag? tags }
+      else
+        songs.select { |song| song.check_tags? tags }
+      end
+    end
+
+= slide 'Грешка #13', 'Методи, които правят две неща' do
+  example:
+    class Song
+      # ...
+      def name(compare_with = nil)
+        compare_with.nil? ? @name : @name == compare_with
+      end
+
+      def artist(compare_with = nil)
+        compare_with.nil? ? @artist : @artist == compare_with
+      end
+    end
+
+  p По-добре щеше да стане, ако бяха <code>matches_name?</code> и <code>matches_name</code>
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/79" Източник
+
+= slide 'Грешка #14', 'Подписи из кода' do
+  example:
+    class Song
+      def filter(saint_lambda)
+        saint_lambda.call self
+      end
+    end
+
+  list:
+    Първо, грешно е. Може да бъде `Proc`, а не `lambda`.
+    Второ, мястото на подписите не е в кода, а в `git` историята.
+    Трето, виж първо и второ.
+
+= slide 'Грешка #14', '"Сладък код"' do
+  p Assembler код из <a href="http://cc2e.com/">Code Complete</a>, (стр. 792):
+
+  pre
+    code
+      MOV AX, 723h  ; R. I. P. L. V. B.
+
+  list:
+    Кода прави фатална грешка на този ред.
+    Коментара е криптичен.
+    `723` в шестнадесетична и e `1827` в десетична.
+    Лудвиг ван Бетовен е починал през 1827.
+    Ааахааа...
+
+= slide 'Грешка #15', 'Monkey patch на вградени класове' do
+  example:
+    class Array
+        def dc
+            self.map(&:downcase)
+        end
+        def split arg
+            self
+        end
+        alias has? include?
+        alias d_if delete_if
+    end
+    class String
+        alias dc downcase
+        def trim
+            self.gsub(/( ){2,}/,'')
+        end
+    end
+
+  p Не. Просто не. Плюс, лоша идентация.
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/91" Източник
+
+= slide 'Грешка #16', 'if then else end на един ред' do
+  example:
+    subgenre = if genre_sub.length > 1 then genre_sub[1] else nil end
+
+  p Пише се или така:
+
+  example:
+    subgenre = if genre_sub.length > 1
+      genre_sub[1]
+    else
+      nil
+    end
+
+  p Или така:
+  
+  example:
+    subgenre = genre_sub.length > 1 ? genre_sub[1] : nil
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/75" Източник
+
+= slide 'Грешка #17', 'if then end на един ред' do
+  example:
+    def initialize attributes
+      @name = if attributes[0] != nil then attributes[0].strip end
+      @artist = if attributes[1] != nil then attributes[1].strip end
+      @genre = if attributes[2] != nil then (attributes[2].split ",") [0].strip end
+      @subgenre = if attributes[2] != nil then (attributes[2].split ",") [1] end
+      if @subgenre != nil then @subgenre.strip! end
+      if @genre != nil then @tags = Array (@genre.downcase) end
+      if @subgenre != nil then @tags << @subgenre.downcase.strip end
+      if attributes[3] != nil 
+        (attributes[3].split ",").each { |tag|  @tags << tag.strip }
+      end
+    end
+
+  p Доста по-екстремно.
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/96" Източник
+
+= slide 'Грешка #17', 'if then end на един ред' do
+  list:
+    `if condition? then 42 end` връща `nil` ако `condition?` е неистина.
+    Въпреки това, криво е когато кодът зависи от тази особенност.
+    Може да напишете: `condition? ? 42 : nil`
+    В примера беше <code>@name = if x[1] != nil then x[1].strip end</code>
+    Това може да се запише така: <code>@name = x[1] && x[1].strip</code>
+
+= slide 'Грешка #18', 'require на странно място' do
+  example:
+    class Collection 
+      require 'set'
+
+      attr_accessor :songs
+
+      def initialize (songs_as_string, artist_tags)
+        # ...
+      end
+
+      # ...
+    end
+
+  p Не че сме ви говорили за <code>require</code>, но ако го ползвате, той трябва да стои най-горе.
+
+  p.action Впрочем, между <code>initialize</code> и скобата не трябва да има празно място.
+
+= slide 'Грешка #19', 'неспазване на конвенции' do
+  example:
+    class Collection
+      def initialize(string, stringTags)
+       @arrSongs = []
+       arrArtist = []
+       i=0
+       string.each_line { |n| @arrSongs.push Song.new(n) }
+       @arrSongs.each do |n| 
+       arrArtist.push n.artist
+       end
+       arrArtist.each do |value|
+       if stringTags.has_key? (value)
+          @arrSongs[i].change_tags (stringTags[value].to_s.gsub('"','')) 
+       end
+       i+=1
+       end
+      end
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/126" Източник
+
+= slide 'Грешка #19', 'неспазване на конвенции' do
+  p Какви грешки имаше тук?
+
+  list:
+    Пише се `string_tags`, а не `stringTags`
+    Нещата в блокове се идентират с два интервала навътре.
+    Не три, не един, не нула. Два.
+    `stringTags.has_key? (value)` е психаделично. Пише се `.has_key?(value)`.
+    За последното Ruby дори дава warning, но кой да чете.
+    `n`, `arrArtist`, `@arrSongs`, `i` са невероятно странни имена.
+    До тук, тази задача е на -2 точки.
+
+= slide 'Грешка #19', 'неспазване на конвенции' do
+  example:
+    def find(criteria)
+      result = @music
+      criteria.each { |key, value| 
+
+        if key == :tags
+          result = @music.select { |song|
+            # not working 
+            (song.send(key) & value.split).sort == value.split.sort }
+
+        elsif key == :filter
+          result = @music.select { |song| value.call song }
+        
+        else
+          result = @music.select { |song| song.send(key) == value }
+        end
+      }
+      result
+    end
+
+  ul
+    li Ако блока е на повече от един ред се ползва <code>do</code>/<code>end</code>.
+    li Скобата в <code>if key == :tags</code> е много странно затворена.
+    li <code>result =</code> трябваше да е преди <code>if</code>-а
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/113" Източник
+
+= slide 'Грешка #20', 'Странно подравняване' do
+  example:
+    def initialize(song_attributes,artist_tags)
+      @name = song_attributes[0].strip
+          @artist = song_attributes[1].strip
+      n = song_attributes[2].split(", ")
+      @genre = n[0].strip
+      if n[1].nil? then @subgenre = nil
+      else @subgenre = n[1].chomp
+      end
+      @tags = []
+      if song_attributes[3] != nil then @tags << song_attributes[3].split(", ")
+      end
+      @tags << @genre.downcase << @subgenre      
+      @tags.delete_if {|x| x == nil}.flatten!
+      @tags.each {|n| n.strip!}.map{|n| n.downcase!}
+      artist_tags.each do|key,value| if key==@artist then @tags<<value.flatten!
+      end
+      end
+    end
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/120" Източник
+
+= slide 'Feature Envy', 'code smell' do
+  example:
+    class Collection
+      def filter_by_name(songs, name)
+        songs.select { |song| song.name == name }
+      end
+
+      def filter_by_artist(songs, artist)
+        songs.select { |song| song.artist == artist }
+      end
+
+      def filter_by_lambda(songs, filter)
+        songs.select(&filter)
+      end
+
+      def filter_by_tags(songs, tags)
+        if tags.class == String then
+          songs.select { |song| song.check_tag? tags }
+        else
+          songs.select { |song| song.check_tags? tags }
+        end
+      end
+    end
+
+  a href="http://fmi.ruby.bg/tasks/2/solutions/83" Източник
+
+= slide 'Обяснение на предишния слайд' do
+  list:
+    <strong>Feature envy</strong> е един от code smell-овете в <em>Refactoring</em>.
+    Появява се, когато един клас много зависи от данните на друг.
+    Завижда му на feature-ите, демек.
+    В този случай, колекцията "завижда" на песента.
+    Решението е тези неща да се изместят от "завиждащия" клас в другия.
+    В случай, би се свело до `song.matches? criteria`.
+
+= slide 'Принцип: Single Responsibility Principle' do
+  list:
+    Един от петте SOLID принципа.
+    Ще го дъвчем цяла година.
+    Гласи, че един клас трябва да прави точно едно нещо.
+    В нашия случай е адекватно колекцията да парси входа, а песента да прилага филтъра.
+    Така песента не зависи от входа (който се подава на колекцията).
+    Така колекцията не зависи само от един метод на песента - `matches?`.
+    Друга формулировка: един клас трябва да има точно една причина да се променя.
+
+= slide 'Shotgun surgery', 'code smell' do
+  list:
+    Какво трябва да се промени във вашето решение, ако искаме да добавим нов филтър? Например по subgenre.
+    Очевидно песента.
+    Трябва ли да се промени `Collection`?
+    Shotgun surgery е когато една промяна изисква пипане в няколко различни класа.
+    Ако трябва да се пипате и `Song` и `Collection`, това е сипмтом.
+    Как може да организирате кода, така че да не се налага?
+    Може да напишете `Collection` така, че да не знае за полетата на `Song`.
+    Какво трябва да се промени, за да добавите нов атрибут на `Song`?
+    Тук подходящия дизайн не е толкова ясен.
+
+= slide 'Принципи и миризми' do
+  list:
+    Не са точна наука.
+    Не са и checklist-ове, на които кода ви да отговоря.
+    Добри инструменти за анализ.
+    Структурират ви мисловния процес, докато мислите върху дизайна.
+    По някога е ОК да не се съобразявате с тях. Понякога не е.
+    Въпрос на усет. Въпрос на опит.
