@@ -1,0 +1,194 @@
+= slide 'Константи и имена на класове' do
+  list:
+    В Ruby всичко, което започва с главна буква, е константа
+    Имената на класове са константи, но се пишат с `UpperCamelCase` <strong>по конвенция</strong>
+    Обикновени константи, които ползвате в даден клас/модул, се пишат със `SCREAMING_SNAKE_CASE` <strong>по конвенция</strong>
+
+= slide 'Класови методи' do
+  list:
+    За това ще си говорим още в бъдещ момент, но:
+    Когато декларирате класови методи, не ползвайте `def MyClass.my_method`
+    Вместо това ползвайте `def self.my_method`
+
+= slide 'Kernel#sprintf и String#%' do
+  list:
+    Не ползвайте `Kernel#sprintf`; вместо това има `String#%`, т.е.:
+    Не: `sprintf("| %-44s%2s | %8.2f |\n", @label, @quantity.to_s, calculate)`
+    Да: `"| %-44s%2s | %8.2f |\n" % [@label, @quantity.to_s, calculate`]
+
+= slide 'Без излишни скоби' do
+  list:
+    Избягвайте излишните скоби — в изрази, при дефиниране/извикване на функции и прочее; например:
+    Не: `(@cart.coupon) ? @cart.coupon.calc_price : @cart.without_coupon`
+    Не: `(discounted > 0) ? -discounted * @product.price * @percent * '0.01'.to_d : 0`
+    Да: `@cart.coupon ? @cart.coupon.calc_price : @cart.without_coupon`
+    Да: `discounted > 0 ? -discounted * @product.price * @percent * '0.01'.to_d : 0`
+    Изобщо: тези изрази са малко трудно четими за тернари оператори, по-добре `if`-`else`
+
+= slide 'Whitespace', 'ich bin eine whitespace nazi' do
+  list:
+    Нови редове: между дефиниции на методи в клас
+    Между дефинициите на класове/модули
+    След блока с `require`-директиви
+    Преди израза, връщан от дадена функция, ако функцията не е едноредова
+    `@@promotion_list=[:get_one_free ,:package ,:threshold]` — noooo...
+
+= slide 'Whitespace', 'OMG идентация...' do
+  img src="http://dl.dropbox.com/u/2664150/Screenshots/fahhs6xpbk-f.png" alt="OMG Indentation"
+
+= slide 'Излишни неща' do
+  list:
+    Без `return` на последния ред на метод
+    Самостоятелни `if not` са по-известни като `unless`
+    `private # Private` — можете повече!
+    Без `then` в стандартни `if`-конструкции; например, избягвайте това:
+  div.action
+    example:
+      if (10...20).include?(cardinal) then
+        something...
+      end
+
+= slide 'Странен код', 'серия първа' do
+  p Не:
+  example:
+    if not promotion.empty?
+      new_promo.promo[new_product] = promotion.to_a
+      make_promoted(new_product)
+      else has_promotion[new_product] = false
+    end
+  div.action
+    p Поне да е нещо такова:
+    example:
+      if promotion.empty?
+        has_promotion[new_product] = false
+      else
+        new_promo.promo[new_product] = promotion.to_a
+        make_promoted(new_product)
+      end
+
+= slide 'Странен код' do
+  p Не ползвайте `unless` с `else`! Ако ви се налага, ползвайте `if`-`else`
+  p Плюс това, идентация...
+  example:
+    unless inventory.new_promo.promo[product].kind_of? Hash
+      inventory.new_promo.get_one_free(product, one_s_price, quantity, value)
+    else inventory.new_promo.promo_type(product, one_s_price, quantity, pack, value)
+    end
+
+= slide 'Странен код', 'серия втора, част първа' do
+  p Ох...
+  example:
+    def execute(amount,price)
+      return calculate_get_one_free(amount,price) if @name == :get_one_free
+
+      return calculate_package(amount,price) if @name == :package
+
+      return calculate_threshold(amount,price) if @name == :threshold
+
+    end
+
+  div.action
+    p Ма-а-алко по-добре:
+    example:
+      def execute(amount, price)
+        case @name
+        when :get_one_free then calculate_get_one_free(amount, price)
+        when :package      then calculate_package(amount, price)
+        when :threshold    then calculate_threshold(amount, price)
+        end
+      end
+
+= slide 'Странен код', 'серия втора, част втора (става касова продукция...)' do
+  div.action
+    p Или пък:
+    example:
+      def execute(amount, price)
+        send "calculate_#{@name}", amount, price
+      end
+  p.action За това ще си говорим по-нататък; не е непременно добра практика :)
+
+= slide 'Странен код', 'вече е трилогия' do
+  example:
+    class ShopCar
+
+      def shop_car()
+        @shop_car = {}
+      end
+
+  list:
+    Именоване, именоване, именоване, именоване... `ShopCar`!?
+    Без празен ред между дефиницията на метода и `class MyClass`
+    Без кръгли скоби около дефиницята на метода; той дори няма аргументи...
+    Радваме се, че въпреки странните имена, поне сте консистентни: `@shop_car = ...` :)
+
+= slide 'Странен код', 'Доктор "Ох, боли ме сърцето..."' do
+  list:
+    `cena = total`
+  div.action
+    example:
+      `t = '0.00'.to_d`
+      helper = inventory.all_coupons[name_of_coupon]
+      t = helper[0] == :percent ? cpn.percent(cena, helper[1]) : cpn.amount(cena, helper[1])
+      # съжалявам за съкращенията, но трябваше да се сместя в sceptic
+  p.action Можете повече, вярваме във вас :)
+
+= slide 'Странен код' do
+  example:
+    def function(w, x, y, z)
+      - ( ( ( w - x ) * y.to_d ) * ( z / 100 ))
+    end
+  p.action Keeewl...
+
+= slide 'Странен код' do
+  example:
+    class Numeric
+      def ordinal
+        cardinal = self.to_i.abs
+        if (10...20).include?(cardinal) then
+          cardinal.to_s << 'th'
+        else
+          cardinal.to_s << %w{th st nd rd th th th th th th}[cardinal % 10]
+        end
+      end
+    end
+  list:
+    Внимателно с moneky-patch-ването; в Ruby е опасно лесно
+    `cardinal.to_s << %w{th st nd rd th th th th th th}[cardinal % 10]`? :)
+
+= slide 'Странен код', 'не така' do
+  example:
+    def package(product, one_s_price, quantity, pack, value)
+      out_of_pack = quantity % pack
+      if  promo[product].has_key?(:package) and quantity >= pack
+        return function(quantity, out_of_pack, one_s_price, value)
+        else return '0.00'.to_d
+      end
+    end
+
+= slide 'Странен код', 'малко по-добре е така' do
+  example:
+    def package(product, one_s_price, quantity, pack, value)
+      out_of_pack = quantity % pack
+
+      if promo[product].has_key?(:package) and quantity >= pack
+        a_better_named_function(quantity, out_of_pack, one_s_price, value)
+      else
+        '0.00'.to_d
+      end
+    end
+
+= slide 'Владеене на езика' do
+  list:
+    Необходимо е да се стараете не само в Ruby, но и в обикновения език, който ползвате (английски, български...)
+    Бъдете консистентни — коментари и на български, и на английски не са добра идея
+    `raise 'Give me a name, not a novell!' if item_name.length > 40` — <em>novel</em> се пише с едно <strong>l</strong>
+
+
+= slide 'Coding-style Guide в Ruby', 'произведение на г-н Бацов и с-ие' do
+  list:
+    Хвърлете едно око на този <a href="https://github.com/bbatsov/ruby-style-guide#readme">неофициален guide за стил на кода в Ruby</a>
+    Не сме 100% съгласни с този guide, но в голямата си част ще ви е полезен
+    С всеки изписан символ код, се замислете дали ще се чете лесно и разбере лесно от средностатистическия член на вашия екип
+    Ако пишете код сам, трябва да си налагате още по-тежки ограничения — ще се благославяте след месец, месец и нещо...
+    Успех! :)
+
