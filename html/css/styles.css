@@ -1,5 +1,5 @@
 /*
- * HTML Slideshow 
+ * HTML Slideshow
  * Orignal uthor: Rob Flaherty | rob@ravelrumba.com
  */
 
@@ -15,8 +15,8 @@ strong{ font-weight:bold; }
 em { font-style: italic; }
 hr { display: none; }
 img { display: block; }
-a img { border: none; } 
-cite { font-style: normal; } 
+a img { border: none; }
+cite { font-style: normal; }
 code { padding: 0 3px; }
 blockquote { margin:0 0 24px 32px; border-left:7px solid #ececec; padding-left:16px; }
 blockquote p { margin:0; }
@@ -64,7 +64,7 @@ body{ background:#f5f6f6; }
 #deck table th,
 #deck blockquote,
 #deck table td { font-family: Arial; font-size:20px; text-shadow: 0px 1px 0px rgba(255, 255, 255, 0.8); }
-#deck code { font-family: Monaco; }
+#deck code { font-family: Monaco; background-color: #f8f8ff; color: #444; padding: 1px 3px; border: 1px solid #dedede; border-radius: 2px; }
 #deck pre { margin-bottom: 1em; }
 #deck kbd { font-family: Monaco; }
 #deck section:first-child hgroup { text-align: center; padding-top: 100px !important; }
