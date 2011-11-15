@@ -1,0 +1,345 @@
+= slide 'Днес' do
+  list:
+    `require`.
+    Структура на простички gem-ове.
+    Ред дребни неща, които не сме споменавали.
+
+= slide 'Импортиране на файлове' do
+  p В Ruby код от други файлове се импортира с <code>require</code>.
+
+  p Например:
+
+  example:
+    require 'bigdecimal'
+    require 'bigdecimal/util'
+
+= slide 'Какво търси require?' do
+  list:
+    <code>require 'foo'</code> търси файл <code>foo.rb</code> в "пътят за зареждане".
+    Още известен като load path.
+    Той съдържа няколко "системни" пътища плюс пътища от gem-ове.
+    Очевидно, <code>require 'foo/bar'</code> търси директория <code>foo</code> с файл <code>bar.rb</code>.
+    <code>require './foo'</code> търси <code>foo.rb</code> в текущата директория.
+    Разбира се, абсолютни пътища също работят: <code>require '/home/skanev/foo.rb'</code>.
+
+= slide 'Load path', 'където Ruby търси файлове за require' do
+  ul
+    li Достъпен е като <code>$LOAD_PATH</code>.
+    li Още <code>$:</code>
+    li Може да го променяте. Стандартно с <code>$:.unshift(path)</code>
+    li Обикновено всеки gem добавя нещо там.
+
+= slide 'Как работи require?' do
+  list:
+    Изпълнява файла.
+    Константите, класове, глобални променливи и прочее са достъпни отвън.
+    Няма абстракция. Все едно сте inline-нали файла на мястото на <code>require</code>-а. Почти.
+    Файлът е изпълнен с друг binding. Демек, локалните му променливи са изолирани. Но само те.
+    Не че има значение, но <code>main</code> обекта е същия.
+    Файлът се изпълнява само веднъж. Повторни <code>require</code>-и не правят нищо.
+    Последното може да се излъже по няколко начина.
+    <code>require</code> може да зарежда <code>.so</code> и <code>.dll</code> файлове.
+
+= slide 'Типичната структура на един gem', 'skeptic опростен' do
+  pre
+    ' .
+      ├── README.rdoc
+      ├── Rakefile
+      ├── bin
+      │   └── skeptic
+      ├── features
+      ├── lib
+      │   ├── skeptic
+      │   │   ├── rules.rb
+      │   │   └── scope.rb
+      │   └── skeptic.rb
+      ├── skeptic.gemspec
+      └── spec
+
+= slide 'Особеностите' do
+  list:
+    <code>lib/</code> обикновено съдържа <code>foo.rb</code> и <code>lib/foo/</code>.
+    <code>foo.rb</code> обикновено е единственото нещо в <code>lib/</code>.
+    Всичко останало е в <code>lib/foo</code>.
+    <code>lib/</code> се добавя в load path.
+    Така вече може да правите <code>require 'foo'</code> или <code>require 'foo/something'</code>.
+    По този начин не замърсявате <code>require</code> областта.
+    RubyGems прави това "автомагично".
+
+= slide 'Останалите неща' do
+  ul
+    li Разгледайте #{github_repo('skanev/skeptic')} за повече подробности.
+    li После разгледайте някой друг gem.
+    li После си поиграйте малко с <code>require</code> и <code>$LOAD_PATH</code> и вижте какво се случва.
+
+= slide 'Kernel#load' do
+  list:
+    `load` е много сходен с `require`, но има няколко разлики.
+    Иска разширение на файл - `load 'foo.rb'`.
+    Повторни `load`-ове изпълняват файла.
+    `load` не може да зарежда `.so`/`.dll` библиотеки.
+    `load` има опционален параметър, с който може да обвие файла в анонимен модул.
+    Последното дава известна изолация.
+
+= slide 'Следва' do
+  p Ред малки, дребни, забавни неща в Ruby.
+
+= slide 'Object#eql?' do
+  ul
+    li <code>#eql?</code> прави сравнение без type coercion.
+    li Не забравайте, че се ползва и за хешове.
+
+  annotate:
+    1 == 1.0     # =>
+    1.eql?(1.0)  # =>
+
+= slide '$! и $@' do
+  ul
+    li Глобални променливи
+    li <code>$!</code> е последното "възбудено" изключение
+    li <code>$@</code> е stacktrace-а на последното изключение
+
+= slide 'Плосък begin/end' do
+  p Тялото на функция може да работи като <code>begin/end</code>.
+
+  example:
+    def foo
+      begin
+        get_a_life
+      ensure
+        puts 'rm -rf ~/.history'
+      end
+    end
+
+    def bar
+      get_a_life
+    ensure
+      puts 'rm -rf ~/.history'
+    end
+
+  p Едно от любимите ми неща в Ruby.
+
+= slide 'retry в ensure' do
+  p <code>retry</code> изпълнява <code>begin</code> блока отначало.
+
+  example:
+    retries_left = 3
+
+    begin
+      connect_to_facebook
+    rescue ConnectionError
+      retries_left -= 1
+      retry if retries_left > 0
+    end
+
+= slide 'next, break, redo, retry' do
+  p Има много хубава семантика за тях.
+
+  table
+    thead
+      tr
+        th
+        th излизане от...
+        th рестартиране на...
+    tbody
+      tr
+        td ...блока
+        td
+          code next
+        td
+          code redo
+      tr
+        td ...метода
+        td
+          code break
+        td
+          code retry
+
+  p За нещастие, <code>retry</code> не работи извън <code>rescue</code> от Ruby 1.9 насам.
+
+= slide 'def self.foo' do
+  p Има по-кратък начин за дефиниране на класови методи:
+
+  example:
+    class Person
+      def Person.count
+        42
+      end
+
+      def self.count
+        42
+      end
+    end
+
+  p Второто е по-криптично, по пък е по-DRY.
+
+= slide 'Клас променливи' do
+  annotate:
+    class Person
+      @@count = 0
+
+      def initialize
+        @@count += 1
+      end
+
+      def self.how_many
+        @@count
+      end
+    end
+
+    Person.new
+    Person.new
+    Person.how_many # =>
+
+= slide 'Клас променливи', 'семантиката' do
+  list:
+    Очевидно започват с `@@`.
+    Търсят се в обхващащата константата.
+    Ако я няма там, търсят се в родителя на обхващатата константата.
+    Съответно, достъпни са в инстанция и в клас.
+    Ако не са дефинирати, получавате <code>NameError</code> (за разлика от @).
+    Работят объркващо, така че по-добре ги избягвайте.
+    Ако все пак ги ползвате, правете го когато нямате наследяване.
+
+= slide 'Клас променливи' do
+  annotate:
+    class B
+      @@foo = 1
+      def self.foo() @@foo end
+      def self.hmm() @@bar end
+    end
+
+    class D < B
+      @@bar = 2
+      def self.bar() @@bar end
+      def self.change() @@foo = 3; @@bar = 4; end
+    end
+
+    [B.foo, D.foo, D.bar] # =>
+    B.hmm                 #!
+    D.change
+    [B.foo, D.foo, D.bar] # =>
+    B.hmm                 #!
+    D.hmm                 #!
+
+= slide 'Object#send' do
+  p <code>Object#send</code> изпраща някакво съобщение на метод.
+
+  annotate:
+    numbers = [1, 2, 3, 4, 5, 6]
+
+    numbers.inject(0) { |a, b| a + b }        # =>
+
+    numbers.send(:inject, 0) { |a, b| a + b } # =>
+
+= slide 'Object#send', 'и private методи' do
+  ul
+    li <code>send</code> вика private методи.
+    li Има и <code>public_send</code>, който избягва да вика <code>private</code> методи.
+
+= slide 'Object#method_missing' do
+  list:
+    Ако обект не отговаря на някакво съобщение, Ruby вика `method_missing`.
+    Обикновено той е наследен от `Object` и хвърля `NoMethodError`.
+    Можем да го предефинираме.
+    Обикновено трябва да викнем `super`.
+    Трябва да се прави внимателно, понеже има бая поле за грешка.
+
+= slide 'Object#method_missing', 'пример' do
+  annotate:
+    class Hash
+      def method_missing(name, *args, &block)
+        args.empty? ? self[name] : super
+      end
+    end
+
+    things = {fish: 'Nemo', lion: 'Simba'}
+
+    things.fish   # =>
+    things.lion   # =>
+    things.larodi # =>
+    things.foo(1) #!
+
+= slide 'Object#method_missing', 'капани' do
+  p Има и коварни моменти:
+
+  annotate:
+    class Hash
+      def method_missing(name, *arg, &block)
+        args.empty? ? self[name] : super
+      end
+    end
+
+    things = {lion: 'Simba'}
+    things.lion
+
+  list:
+    Има typo - `arg` вместо `args`.
+    `args` всъщност е `self.args`.
+    Безкрайна рекурсия, anyone?
+
+= slide 'String#[]', 'швейцарското ножче в Ruby' do
+  example:
+    a = "hello there"
+    a[1]                   #=> "e"
+    a[1,3]                 #=> "ell"
+    a[1..3]                #=> "ell"
+    a[-3,2]                #=> "er"
+    a[-4..-2]              #=> "her"
+    a[12..-1]              #=> nil
+    a[-2..-4]              #=> ""
+    a[/[aeiou](.)\1/]      #=> "ell"
+    a[/[aeiou](.)\1/, 0]   #=> "ell"
+    a[/[aeiou](.)\1/, 1]   #=> "l"
+    a[/[aeiou](.)\1/, 2]   #=> nil
+    a["lo"]                #=> "lo"
+    a["bye"]               #=> nil
+
+= slide 'Object#initialize' do
+  p Всъщност, <code>#initialize</code> е просто instance метод.
+
+  p <code>Class#new</code> е имплементиран горе-долу така:
+
+  example:
+    class Class
+      def new
+        object = self.allocate
+        object.send :initialize
+        object
+      end
+    end
+
+= slide 'Module#const_missing' do
+  annotate:
+    module Unicode
+      def self.const_missing(name)
+        if name.to_s =~ /^U([0-9a-fA-F]{4,5}|10[0-9a-fA-F]{4})$/
+          codepoint = $1.to_i(16)
+          utf8 = [codepoint].pack('U')
+          utf8.freeze
+          const_set(name, utf8)
+          utf8
+        else
+          super
+        end
+      end
+    end
+
+    Unicode::U20AC  # =>
+    Unicode::U221E  # =>
+    Unicode::Baba   #!
+
+= slide 'Object#dup, Object#clone, #initialize_copy' do
+  list:
+    <code>#dup</code> и <code>#clone</code> правят копие на обект.
+    Копието е "shallow" копие. Ако има instance променливи, те сочат на същото място.
+    След като се направи се вика <code>#initialize_copy</code>.
+    Има разлика между тях, но още не сме я учили.
+    Добре, `#clone` копира singleton методи и freeze-ва обекта, ако е замразен. Така по-ясно ли е?
+    
+
+  p 
+
+  
+
+

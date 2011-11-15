@@ -27,10 +27,18 @@
   slug: 06-common-mistakes-in-homework
   date: 2011-10-31
 7:
-  title: 07. Ruby-стил в и около трета задача
-  slug: 07-homework-03
+  title: 07. Трето домашно и case
+  slug: 07-third-assignment-case
   date: 2011-11-07
 8:
   title: 08. Регулярни изрази
   slug: 08-regular-expressions
   date: 2011-11-08
+9:
+  title: 09. Изключения и enumerator-и
+  slug: 09-exceptions-enumerators
+  date: 2011-11-14
+10:
+  title: 10. require и други неща
+  slug: 10-require-and-other-stuff
+  date: 2011-11-15
