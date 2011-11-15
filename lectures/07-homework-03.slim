@@ -14,7 +14,7 @@
   list:
     Не ползвайте `Kernel#sprintf`; вместо това има `String#%`, т.е.:
     Не: `sprintf("| %-44s%2s | %8.2f |\n", @label, @quantity.to_s, calculate)`
-    Да: `"| %-44s%2s | %8.2f |\n" % [@label, @quantity.to_s, calculate`]
+    По-добре: `"| %-44s%2s | %8.2f |\n" % [@label, @quantity.to_s, calculate]`
 
 = slide 'Без излишни скоби' do
   list:
@@ -67,7 +67,7 @@
       end
 
 = slide 'Странен код' do
-  p Не ползвайте `unless` с `else`! Ако ви се налага, ползвайте `if`-`else`
+  p Не ползвайте <code>unless</code> с <code>else</code>! Ако ви се налага, ползвайте <code>if</code>-<code>else</code>
   p Плюс това, идентация...
   example:
     unless inventory.new_promo.promo[product].kind_of? Hash
@@ -126,7 +126,7 @@
     `cena = total`
   div.action
     example:
-      `t = '0.00'.to_d`
+      t = '0.00'.to_d
       helper = inventory.all_coupons[name_of_coupon]
       t = helper[0] == :percent ? cpn.percent(cena, helper[1]) : cpn.amount(cena, helper[1])
       # съжалявам за съкращенията, но трябваше да се сместя в sceptic
@@ -137,7 +137,7 @@
     def function(w, x, y, z)
       - ( ( ( w - x ) * y.to_d ) * ( z / 100 ))
     end
-  p.action Keeewl...
+  p.action Keeewl... А какво точно правеше този метод? Хм...
 
 = slide 'Странен код' do
   example:
@@ -153,7 +153,8 @@
     end
   list:
     Внимателно с moneky-patch-ването; в Ruby е опасно лесно
-    `cardinal.to_s << %w{th st nd rd th th th th th th}[cardinal % 10]`? :)
+    `cardinal.to_s << %w{th st nd rd th th th th th th}[cardinal % 10]`? Интересно, но...
+    Как не ви изсъхват пръстите да пишете `th`, `th`, `th`, ...
 
 = slide 'Странен код', 'не така' do
   example:
@@ -179,7 +180,7 @@
 
 = slide 'Владеене на езика' do
   list:
-    Необходимо е да се стараете не само в Ruby, но и в обикновения език, който ползвате (английски, български...)
+    Необходимо е да се стараете не само в Ruby (или изобщо в програмните езици), но и в майчиния си език
     Бъдете консистентни — коментари и на български, и на английски не са добра идея
     `raise 'Give me a name, not a novell!' if item_name.length > 40` — <em>novel</em> се пише с едно <strong>l</strong>
 
