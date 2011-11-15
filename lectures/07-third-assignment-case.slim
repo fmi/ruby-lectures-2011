@@ -1,0 +1,380 @@
+= slide 'Днес' do
+  list:
+    Ще разгледаме решения на трета задача.
+    Ще разберем какво всъщност е полиморфизъм.
+    Ще разберем какво е Null Object pattern.
+    Ще видим `case` оператора в Ruby.
+    Ще видим съществената разлика между структури и обекти.
+
+= slide 'Утре' do
+  p Регулярни изрази
+
+= slide 'Преди това' do
+  list:
+    Не задавате достатъчно въпроси ;(
+    Митьо твърди че съм страшен.
+    Което е странно, защото съм мега забавен.
+    Мисля, че имам решение.
+
+= slide 'Вместо четвърта задача' do
+  list:
+    Правите fork на едно GitHub repo.
+    Пренаписвате първите три задачи с новите познания.
+    Написвате 20 неща, които сте научили.
+    Всичко е публично.
+
+= slide 'watchr', '$ gem install watchr' do
+  list:
+    Поредния интересен gem.
+    Следи файл за промени.
+    Изпълнява команда, когато файла бъде променен.
+    Подходящ за домашните.
+    Би трябвало да работи под Windows.
+    Пуска се така: `watchr watch.rb`.
+    Примерен `watch.rb` файл:
+
+  .action
+    example:
+      watch('solution.rb') do
+        system 'rspec --require ./solution sample_spec.rb'
+      end
+
+= slide 'Как решаваме втора задача', 'с watchr' do
+  list:
+    Решението ни е в `solution.rb`.
+    Създаваме `watch.rb`, който да пуска тестовете при промяната му.
+    Добавяме и `skeptic` извикване.
+    rspec има опция `--fail-fast`, която спира изпълнението на първия неуспешен тест.
+    Изпадаме в следния цикъл:
+
+  example:
+    until spec_passing?
+      write_code
+      save
+      look_at :watchr_output
+    end
+
+= slide 'Решение на трета задача' do
+  p Преди това:
+
+  p Какви проблеми срещнахте?
+
+= slide 'Какво очаквахме от вас' do
+  list:
+    Поне 8 класа. Абсолютен минимум.
+    Инвентар, продукт, количка, три вида промоции, два вида купони.
+    Десет класа е реалистично решение.
+    Моето решение има 12.
+    Трябва да се научите да правите малки класове.
+
+= slide 'Моето решение' do
+  p Следва моето решение, на части.
+
+= slide 'Inventory#initialize' do
+  example:
+    class Inventory
+      def initialize
+        @products = []
+        @coupons  = []
+      end
+
+      # ...
+    end
+
+  list:
+    Пазим списък от продукти и купони.
+    Купоните и продуктите са отделни класове.
+    Просто списък. Не хеш, не множество, не комплексна структура.
+    Ако ни трябва нещо по-сложно, лесно ще минем към него.
+
+
+= slide 'Inventory#register' do
+  example:
+    def register(name, price, options = {})
+      price     = price.to_d
+      promotion = Promotions.for options
+
+      @products << Product.new(name, price, promotion)
+    end
+
+  list:
+    Инстанцира продукт.
+    Обработва параметрите (`price.to_d`) и ги подава на `Product.new`.
+    Делегира извеждането на промоция от `options` на `Promotions`.
+    Още не знаем какво е `Promotions`.
+
+= slide 'Inventory#new_cart' do
+  example:
+    class Inventory
+      def new_cart
+        ShoppingCart.new self
+      end
+    end
+
+  list:
+    Очевидно.
+    Няма нужда от нищо повече.
+    Това е допълнително ниво на абстракция.
+    Интересно е, понеже инвентара може да знае за количките.
+
+= slide 'class Product' do
+  example:
+    class Product
+      def initialize(name, price, promotion)
+        raise "Name should be at most 40 characters" unless name.length <= 40
+        raise "Only prices between 0.01 and 999.99 allowed" unless 0 < price and price < 1000
+
+        @name      = name
+        @price     = price
+        @promotion = promotion
+      end
+
+      # ...
+    end
+
+= slide 'class Product', 'мотивация' do
+  list:
+    Продукта не знае, че цената някога е била низ.
+    Продукта не знае за различните видове промоции
+    Много е подходящ за метод `discount_for(count)`.
+
+= slide 'ShoppingCart#initialize' do
+  example:
+    class ShoppingCart
+      attr_reader :items, :coupon
+
+      def initialize(inventory)
+        @inventory  = inventory
+        @items      = []   # инстанции на LineItem
+        @coupon     =      # засега няма купон
+      end
+
+= slide 'ShoppingCart#add' do
+  example:
+    def add(product_name, count = 1)
+      product = @inventory[product_name]
+      item    = @items.detect { |item| item.product == product }
+
+      if item
+        item.count += count
+      else
+        @items << LineItem.new(product, count)
+      end
+    end
+
+  list:
+    Намираме продукт чрез `Inventory#[]`.
+    Гледаме дали съществува такъв `LineItem` и; после или инкрементираме, или създаваме нов.
+    Обърнете внимание как не правим <code>if item = @items.detect {}</code>.
+
+= slide 'Inventory#[]' do
+  example:
+    def [](name)
+      @products.detect { |product| product.name == name } or raise 'Unexisting product'
+    end
+
+  p Нищо сложно.
+
+= slide 'LineItem#initialize' do
+  example:
+    class LineItem
+      attr_reader :product
+      attr_accessor :count
+
+      def initialize(product, count)
+        @product = product
+        @count   = 0
+
+        increase count
+      end
+    end
+
+= slide 'LineItem#increment' do
+  example:
+    class LineItem
+      def increase(count)
+        raise 'You have to add at least one item' if count <= 0
+        raise 'Maximum 99 items of each product can be bought' if count + @count > 99
+        @count += count
+      end
+    end
+
+  p Не е най-интересния метод.
+
+= slide 'ShippingCart#total_price' do
+  example:
+    class ShoppingCart
+      def total
+        items_price - coupon_discount
+      end
+
+      def items_price
+        @items.map(&:price).inject(&:+)
+      end
+      
+      # ...
+    end
+
+  list:
+    <code>LineItem#price</code> изчислява отстъпката.
+    Обърнете внимание, че количката не се интересува колко пъти един продукт е купен.
+    <code>coupon_discount</code> пък изчислява отстъпката от купона.
+    Него ще го видим по-късно.
+
+= slide 'LineItem#price' do
+  example:
+    class LineItem
+      def price()
+        price_without_discount - discount
+      end
+
+      def price_without_discount
+        product.price * count
+      end
+
+      def discount
+        product.discount_for(count)
+      end
+    end
+
+= slide 'LineItem#price (2)' do
+  example:
+    class LineItem
+      def price()       price_without_discount - discount  end
+      def price_without_discount()  product.price * count  end
+      def discount()          product.discount_for(count)  end
+    end # Пример за лошо подравняване
+
+  list:
+    <code>price</code> е изразен чрез два други метода.
+    И двата са нужни за извеждане на касова бележка.
+    Дори да не бяха, щяха да са добра идея.
+    Обърнете внимание на `product.discount_for(count)`
+    Делегираме на продукта. Не знаем нищо за промоцията.
+
+= slide 'Product#discount_for' do
+  example:
+    def discount_for(count)
+      if @promotion
+        @promotion.discount(count, @price)
+      else
+        0
+      end
+    end
+
+  list:
+    Отново, доста проста делегация.
+    Може да стане и по-добре, но на това ще се върнем после.
+
+= slide 'Промоции' do
+  list:
+    Имаме нужда от три класа за промоциите.
+    <code>GetOneFree</code>, <code>PackageDiscount</code> и <code>ThresholdDiscount</code>.
+    Могат да имат общ родител - <code>Discount</code>.
+    От това няма нужда. Няма какво да сложим в този родител.
+    Вместо това, просто ще имат общ протокол. Той ще съдържа два метода.
+    <code>#discount(count, price)</code> връща отстъпката като <code>BigDecimal</code>.
+    <code>#name</code> връща името за касовата бележка.
+
+= slide 'class GetOneFree' do
+  example:
+    class GetOneFree
+      def initialize(nth_item_free)
+        @nth_item_free = nth_item_free
+      end
+
+      def discount(count, price)
+        (count / @nth_item_free) * price
+      end
+
+      def name
+        "buy #{@nth_item_free - 1}, get 1 free"
+      end
+    end
+
+= slide 'Null Object pattern' do
+  p Да се върнем на <code>if</code>-a:
+
+  example:
+    def discount_for(count)
+      if @promotion
+        @promotion.discount(count, @price)
+      else
+        0
+      end
+    end
+
+= slide 'Null Object pattern (2)' do
+  p Просто създайте клас <code>NoPromotion</code>.
+
+  example:
+    class NoPromotion
+      def discount(count, price)
+        0
+      end
+
+      def name
+        ''
+      end
+    end
+
+= slide 'Останалите неща' do
+  list:
+    Вижте моето решение.
+    Вижте другите решения.
+
+= slide 'case' do
+  p В Ruby има "switch". Казва се <code>case</code>.
+
+  example:
+    def quote(name)
+      case name
+        when 'Yoda'
+          puts 'Do or do not. There is no try.'
+        when 'Darth Vader'
+          puts 'The Force is strong with this one.'
+        when 'R2-D2'
+          puts 'Beep. Beep. Beep.'
+        else
+          puts 'Dunno what to say'
+      end
+    end
+
+= slide 'case', 'особености' do
+  list:
+    Няма fall-through. Не се пише `break`.
+    Ако нито един `when` не мине, изпълнява се `else`.
+    Ако нито един `when` не мине, и няма `else`, не става нищо.
+    <code>case</code> е израз, което значи, че връща стойност.
+
+= slide 'case', 'стойности' do
+  p <code>case</code> не сравнява с <code>==</code>. Може да напишете следното.
+
+  example:
+    def qualify(age)
+      case age
+        when 0..12
+          'still very young'
+        when 13..19
+          'a teenager! oh no!'
+        when 33
+          'the age of jesus'
+        when 90..200
+          'wow. that is old!'
+        else
+          'not very interesting'
+      end
+
+= slide 'case', 'Object#===' do
+  p <code>case</code> сравнява с <code>===</code>. Няколко класа го имплементират.
+
+  example:
+    def qualify(thing)
+      case thing
+        when Integer then 'this is a number'
+        when String then 'it is a string'
+        when Array then thing.map { |item| qualify item }
+        else 'huh?'
+      end
+    end
+
