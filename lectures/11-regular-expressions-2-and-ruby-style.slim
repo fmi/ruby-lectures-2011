@@ -1,55 +1,4 @@
-= slide 'Днес' do
-  list:
-    Регулярните изрази в бита на програмиста
-    Регулярните изрази в Ruby (1.9.3)
-    Как да ги ползваме в Ruby код
-    Преди това, две дребни задачки, за да не ви е скучно
-
-= slide 'Традиционната задача', 'за тези от вас, които се чувстват комфортно с РИ' do
-  p Имаме следната задача:
-  blockquote
-    | Да се напише кратък Ruby expression, който проверява дали дадено число е просто или не,
-      посредством употреба на регулярен израз. Резултатът от изпълнението му трябва да е <code>true</code>
-      за прости числа и <code>false</code> за всички останали. Неща, които можете да ползвате:
-    list:
-      Самото число, разбира се.
-      Произволни методи от класа `Regexp`
-      Подходящ регулярен израз (шаблон)
-      Текстовия низ `'1'`.
-      `String#*`.
-      Някакъв условен оператор (например `if`-`else` или `? … : …`)
-      `true`, `false`, ...
-
-= slide 'Нетрадиционната задача', 'за тези от вас, които вече ни знаят номерата' do
-  p Имаме следната задача:
-  blockquote
-    | Да валидирате изрази от следния тип за правилно отворени/затворени скоби:
-    list:
-      `(car (car (car ...)))`
-      Например: `(car (car (car (car list))))`
-      Целта е израз, чиито резултат да може да се ползва в условен оператор (`true`/`false`-еквивалент)
-      Можете да ползвате произволни методи от класа `Regexp`
-      И регулярен израз, разбира се
-  p.action Материалът, необходим за решаването и на двете задачи, ще го има изцяло в днешната лекция.
-
-= slide 'Произход', 'малко обща култура' do
-  list:
-    На възраст над 60 години (Клини)
-    Practical Extraction and Report Language
-    Perl и PCRE-библиотеката (Perl-Compatible Regular Expressions)
-    Почти всеки general-purpose програмен език имплементира някаква форма на РИ
-    Незаменими unix-програми като `grep`, `sed`, `awk`, `vi`, `Emacs`...
-    Разглеждат се дори в курса по ДМ покрай граматики и автомати
-
-= slide 'Проблемна област', 'най-общо: работа с текстови низове' do
-  list:
-    Търсене на по-сложна последователност от символи в низ
-    Заместване на такива последователности с нещо друго
-    Изобщо, модифициране на текстови последователности (например, Markdown към HTML)
-    Проверка дали даден низ отговаря на определени условия (валидация)
-    Проверка дали едно число е просто или не :)
-
-= slide 'Понятия', 'и терминология' do
+= slide 'Терминология', 'припомняне от предишната лекция по темата' do
   list:
     „шаблон“, още „регулярен израз“ (pattern)
     Специални символи (meta characters)
@@ -57,166 +6,6 @@
     Повторители и повторение (quantifiers and repetition)
     Класове от символи (character classes)
     Групи
-
-= slide 'РИ в Ruby', 'синтаксис, накратко' do
-  list:
-    Всеки регулярен израз е обект, инстанция на класа `Regexp`
-    Има литерален синтаксис за създаване на регулярни изрази: `/pattern/`
-    Може да се ползва и синтаксисът с `%r`, например: `%r{/path/maching/made/easy}`
-    Операциите с регулярни изрази са методи на `Regexp`, а някои са в `String`
-
-= slide 'Regexp#match', 'ще го ползваме в примерите' do
-  list:
-    За да демонстрираме какво "хващат" определени шаблони, ще ползваме `Regexp#match`
-    Този метод примеа аргумент текстов низ и връща `nil`, ако шаблонът не "хваща" нищо
-    Връща инстанция на `MatchData`, ако шаблонът "хваща" нещо от низа
-    `MatchData` в детайли — по-късно
-    От тук нататък ще ползваме <em>match-ва</em> като синоним на <em>"хваща"</em> :)
-
-= slide 'Шаблони', '(регулярни изрази, patterns и т.н.)' do
-  list:
-    В сърцето на всеки регулярен израз стои шаблон (pattern)
-    В шаблона, всеки символ (освен някои специални) означава себе си
-    Следователно, шаблонът `/dubstep/` ще отговаря на точно тази последователност от символи в низ
-    Цялата магия е в специалните символи:
-    `(`, `)`, `[`, `]`, `{`, `}`, `.`, `?`, `+`, `*`, `^`, `$`, `\`, ...
-    Някои символи са специални само в определен контекст (например `-`)
-
-= slide 'Най-прост пример' do
-  annotate:
-    /find me/.match 'Can you find me in this long sentence?'  # =>
-    /find me/.match 'I am not here and you will not find ME!' # =>
-  list:
-    Този шаблон не съдържа специални символи
-    Както виждате, по подразбиране шаблоните са чувствителни към регистъра на буквите
-    Може да се промени
-
-= slide 'Специални символи', 'meta characters' do
-  list:
-    `.` съвпада с един произволен символ (с изключение на символите за нов ред)
-    `[` и `]` се ползват за дефиниране на класове от символи
-    `*`, `?`, `+`, `{` и `}` се ползват за указване на повторения
-    `^`, `$`, `\b`, `\B` и т.н. са "котви" и съответстват на определени "междусимволни дупки" :)
-    `|` има смисъл на или, например:
-  div.action
-    annotate:
-      /day|nice/.match  'A nice dance-day.'  # =>
-      /da(y|n)ce/.match 'A nice dance-day.'  # =>
-
-  p.action Внимавайте с приоритета на <code>|</code>
-
-= slide 'Екраниране', 'на специалните символи (escape-ване)' do
-  list:
-    `\` пред специален символ го прави неспециален такъв (екранира го)
-    За да вкарате наклонена черта, ползвате `\\` (като в обикновен низ)
-
-= slide 'Класове от символи', '(character classes)' do
-  list:
-    Заградени между `[` и `]`
-    Match-ват един символ от посочените вътре
-    Могат да се декларират диапазони, например `[a-z]` или `[0-9A-F]`
-    Ако първият символ в класа е `^`, това означава "някой символ, който не е посочен в класа"
-    Можете да екранирате тире в символен клас така: `[a\-b]`
-    Друг вариант е да сложите тирето в началото или в края на класа: `[-abc]` или `[abc-]` - тук то няма специален смисъл
-    Има предефинирани класове от символи
-
-= slide 'Примери с класове от символи' do
-  annotate:
-    /W[aeiou]rd/.match "Word" # =>
-    /[0-9a-f]/.match '9f'     # =>
-    /[9f]/.match     '9f'     # =>
-    /[^a-z]/.match   '9f'     # =>
-
-= slide 'Предефинирани класове от символи' do
-  list:
-    `\w` - символ от дума (`[a-zA-Z0-9_]`)
-    `\W` - символ, който не може да участва в дума (`[^a-zA-Z0-9_]`)
-    `\d` - цифра ([0-9])
-    `\D` - символ, който не е цифра (`[^0-9]`)
-    `\h` - шеснадесетична цифра (`[0-9a-fA-F]`)
-    `\H` - символ, който не е шеснадесетична цифра (`[^0-9a-fA-F]`)
-    `\s` - whitespace-символ (`/[ \t\r\n\f]/`)
-    `\S` - символ, който не е whitespace (`/[^ \t\r\n\f]/`)
-
-= slide 'POSIX-класове от символи' do
-  list:
-    `[[:alpha:]]` - символ от азбука
-    `[[:alnum:]]` - горното или цифра
-    `[[:blank:]]` - интервал или таб
-    `[[:cntrl:]]` - контролен символ
-    `[[:digit:]]` - цифра
-    `[[:lower:]]` - малка буква
-    `[[:upper:]]` - главна буква
-    `[[:print:]]` - printable-символ
-    `[[:punct:]]` - пунктуационен символ
-    `[[:space:]]` - whitespace-символ (вкл. и нов ред)
-    `[[:xdigit:]]` - шеснадеситична цифра
-    И други...
-
-= slide 'Полезни не-POSIX класове' do
-  list:
-    Ruby поддържа и следните не-POSIX символни класове:
-    `[[:word:]]` - символ, който може да участва в дума (работи и за Unicode, за разлика от `\w`)
-    `[[:ascii:]]` - ASCII-символ
-
-= slide 'Символни свойства', 'character properties' do
-  list:
-    С конструкцията `\p{}` може да match-вате символи, имащи съответното свойство (подобно на POSIX)
-    Например: `\p{Alnum}`, `\p{Alpha}`, `\p{Blank}`, `\p{Cntrl}`, `\p{Digit}`, `\p{Graph}`
-    По този начин, например, може да проверите дали даден символ е от японската азбука катакана: `\p{Katakana}`
-    Или пък да match-нете символ от азбука на кирилица: `\p{Cyrillic}`, например:
-
-  div.action
-    annotate:
-      /\s\p{Cyrillic}\p{Cyrillic}\p{Cyrillic}/.match 'Ние сме на всеки километър!' # #<MatchData " сме">
-
-= slide 'Котви' do
-  list:
-    Не съвпадат с реални символи, а вместо това с невидимите граници между тях
-    `^` съвпада с началото на ред
-    `$` съвпада с края на ред
-    `\A` съвпада с началото на текстов низ
-    `\z` съвпада с края на низ
-    `\b` отговаря на граница на дума (когато е извън `[` и `]`; вътре означава `backspace`)
-    `\B` отговаря на място, което не е граница на дума
-
-= slide 'Примери с котви' do
-  annotate:
-    /real/.match "surrealist"    # =>
-    /\Areal/.match "surrealist"  # =>
-    /\band/.match "Demand"       # =>
-
-    /\Band.+/.match "Supply and demand curve" # =>
-
-= slide 'Повторители', '(quantifiers)' do
-  list:
-    Важат за непосредствено предхождащия ги символ/клас/група; нека го означим със `s`
-    `s*` означава нула или повече повторения на `s`
-    `s+` търси едно или повече повторения на `s`
-    `s?` съвпада с нула или едно повторение на `s`
-    `s{m,n}` означава между m и n повторения на `s`
-    В последното можем да пропуснем `m` или `n`:
-    `s{,n}` има смисъл на нула до `n` повторения, а `s{m,}` — поне `m` повторения
-
-= slide 'Примери с повторители' do
-  annotate:
-    /e+/.match     'Keeewl'       # =>
-    /[Kke]+/.match 'Keeewl'       # =>
-    /\w+/.match '2038 - the year' # =>
-    /".*"/.match '"Quoted text!"' # =>
-
-    /[[:upper:]]+[[:lower:]]+l{2}o/.match 'Hello' # =>
-
-= slide 'Алчност' do
-  list:
-    По подразбиране повторителите са "алчни", т.е. изяждат колкото се може повече от низа
-    Това поведение може да се контролира с `?` след повторителя
-    Например `.*?` прави повторението не-алчно
-    Внимавайте с лакомите повторители
-  div.action
-    annotate:
-      /<.+>/.match("<a><b>")  # =>
-      /<.+?>/.match("<a><b>") # =>
 
 = slide 'Групи', 'и прихващане' do
   p Символите <code>(</code> и <code>)</code> се използват за логическо групиране на части от шаблона с цел:
@@ -381,9 +170,9 @@
       raise "Malformed log entry!"
     end
 
-= slide 'case с регулярни изрази' do
+= slide 'case с регулярни изрази', 'работи благодарение на ===' do
   example:
-    # html = '<h1>Header</h1>'
+    html = '<h1>Header</h1>' # или:
     html = '<img src="http://my/image.src" alt="Kartman Makes Burgers" />'
 
     case html
@@ -456,17 +245,208 @@
     `m` превръща шаблона в multiline-такъв (в този режим, например, `.` ще съвпада и с нов ред)
     Има и други, които не се ползват толкова често
 
-= slide 'Решение на проблема, поставен днес', 'проверка за просто число с РИ' do
-  list:
-    Идеи, предложения?
-    `'1' * числото =~ /някакъв регулярен израз/ ? false : true`
-    `'1' * 13 =~ /^1?$|^(11+?)\1+$/ ? false : true`
-    Много полезно знание :) Въпроси по израза?
-    Регулярният израз тук може да се ползва 1:1 в Python за същата цел
-
 = slide 'Документация' do
   list:
     `Regexp`: <a href="http://www.ruby-doc.org/core-1.9.3/Regexp.html">http://www.ruby-doc.org/core-1.9.3/Regexp.html</a>
     `MatchData`: <a href="http://www.ruby-doc.org/core-1.9.3/MatchData.html">http://www.ruby-doc.org/core-1.9.3/MatchData.html</a>
     През `ri`, например: `ri Regexp#=~`
     Мейл до Стефан със subject: `RE: <моят въпрос>`, той ще го Google-не вместо вас и ще ви върне отговор в body-то на email-а
+
+= slide 'Част втора', 'Ruby-стил' do
+  p Следващите слайдове са базирани основно на код, видян в първия ви опит да решите трета задача
+
+= slide 'Константи и имена на класове' do
+  list:
+    В Ruby всичко, което започва с главна буква, е константа
+    Имената на класове са константи, но се пишат с `UpperCamelCase` <strong>по конвенция</strong>
+    Обикновени константи, които ползвате в даден клас/модул, се пишат със `SCREAMING_SNAKE_CASE` <strong>по конвенция</strong>
+
+= slide 'Класови методи' do
+  list:
+    За това ще си говорим още в бъдещ момент, но:
+    Когато декларирате класови методи, не ползвайте `def MyClass.my_method`
+    Вместо това ползвайте `def self.my_method`
+
+= slide 'Kernel#sprintf и String#%' do
+  list:
+    Не ползвайте `Kernel#sprintf`; вместо това има `String#%`, т.е.:
+    Не: `sprintf("| %-44s%2s | %8.2f |\n", @label, @quantity.to_s, calculate)`
+    По-добре: `"| %-44s%2s | %8.2f |\n" % [@label, @quantity.to_s, calculate]`
+
+= slide 'Без излишни скоби' do
+  list:
+    Избягвайте излишните скоби — в изрази, при дефиниране/извикване на функции и прочее; например:
+    Не: `(@cart.coupon) ? @cart.coupon.calc_price : @cart.without_coupon`
+    Не: `(discounted > 0) ? -discounted * @product.price * @percent * '0.01'.to_d : 0`
+    Да: `@cart.coupon ? @cart.coupon.calc_price : @cart.without_coupon`
+    Да: `discounted > 0 ? -discounted * @product.price * @percent * '0.01'.to_d : 0`
+    Изобщо: тези изрази са малко трудно четими за тернари оператори, по-добре `if`-`else`
+
+= slide 'Whitespace', 'ich bin eine whitespace nazi' do
+  list:
+    Нови редове: между дефиниции на методи в клас
+    Между дефинициите на класове/модули
+    След блока с `require`-директиви
+    Преди израза, връщан от дадена функция, ако функцията не е едноредова
+    `@@promotion_list=[:get_one_free ,:package ,:threshold]` — noooo...
+
+= slide 'Whitespace', 'OMG идентация...' do
+  img src="http://dl.dropbox.com/u/2664150/Screenshots/fahhs6xpbk-f.png" alt="OMG Indentation"
+
+= slide 'Излишни неща' do
+  list:
+    Без `return` на последния ред на метод
+    Самостоятелни `if not` са по-известни като `unless`
+    `private # Private` — можете повече!
+    Без `then` в стандартни `if`-конструкции; например, избягвайте това:
+  div.action
+    example:
+      if (10...20).include?(cardinal) then
+        something...
+      end
+
+= slide 'Странен код', 'серия първа' do
+  p Не:
+  example:
+    if not promotion.empty?
+      new_promo.promo[new_product] = promotion.to_a
+      make_promoted(new_product)
+      else has_promotion[new_product] = false
+    end
+  div.action
+    p Поне да е нещо такова:
+    example:
+      if promotion.empty?
+        has_promotion[new_product] = false
+      else
+        new_promo.promo[new_product] = promotion.to_a
+        make_promoted(new_product)
+      end
+
+= slide 'Странен код' do
+  p Не ползвайте <code>unless</code> с <code>else</code>! Ако ви се налага, ползвайте <code>if</code>-<code>else</code>
+  p Плюс това, идентация...
+  example:
+    unless inventory.new_promo.promo[product].kind_of? Hash
+      inventory.new_promo.get_one_free(product, one_s_price, quantity, value)
+    else inventory.new_promo.promo_type(product, one_s_price, quantity, pack, value)
+    end
+
+= slide 'Странен код', 'серия втора, част първа' do
+  p Ох...
+  example:
+    def execute(amount,price)
+      return calculate_get_one_free(amount,price) if @name == :get_one_free
+
+      return calculate_package(amount,price) if @name == :package
+
+      return calculate_threshold(amount,price) if @name == :threshold
+
+    end
+
+  div.action
+    p Ма-а-алко по-добре:
+    example:
+      def execute(amount, price)
+        case @name
+        when :get_one_free then calculate_get_one_free(amount, price)
+        when :package      then calculate_package(amount, price)
+        when :threshold    then calculate_threshold(amount, price)
+        end
+      end
+
+= slide 'Странен код', 'серия втора, част втора (става касова продукция...)' do
+  div.action
+    p Или пък:
+    example:
+      def execute(amount, price)
+        send "calculate_#{@name}", amount, price
+      end
+  p.action За това ще си говорим по-нататък; не е непременно добра практика :)
+
+= slide 'Странен код', 'вече е трилогия' do
+  example:
+    class ShopCar
+
+      def shop_car()
+        @shop_car = {}
+      end
+
+  list:
+    Именоване, именоване, именоване, именоване... `ShopCar`!?
+    Без празен ред между дефиницията на метода и `class MyClass`
+    Без кръгли скоби около дефиницята на метода; той дори няма аргументи...
+    Радваме се, че въпреки странните имена, поне сте консистентни: `@shop_car = ...` :)
+
+= slide 'Странен код', 'Доктор "Ох, боли ме сърцето..."' do
+  list:
+    `cena = total`
+  div.action
+    example:
+      t = '0.00'.to_d
+      helper = inventory.all_coupons[name_of_coupon]
+      t = helper[0] == :percent ? cpn.percent(cena, helper[1]) : cpn.amount(cena, helper[1])
+      # съжалявам за съкращенията, но трябваше да се сместя в sceptic
+  p.action Можете повече, вярваме във вас :)
+
+= slide 'Странен код' do
+  example:
+    def function(w, x, y, z)
+      - ( ( ( w - x ) * y.to_d ) * ( z / 100 ))
+    end
+  p.action Keeewl... А какво точно правеше този метод? Хм...
+
+= slide 'Странен код' do
+  example:
+    class Numeric
+      def ordinal
+        cardinal = self.to_i.abs
+        if (10...20).include?(cardinal) then
+          cardinal.to_s << 'th'
+        else
+          cardinal.to_s << %w{th st nd rd th th th th th th}[cardinal % 10]
+        end
+      end
+    end
+  list:
+    Внимателно с moneky-patch-ването; в Ruby е опасно лесно
+    `cardinal.to_s << %w{th st nd rd th th th th th th}[cardinal % 10]`? Интересно, но...
+    Как не ви изсъхват пръстите да пишете `th`, `th`, `th`, ...
+
+= slide 'Странен код', 'не така' do
+  example:
+    def package(product, one_s_price, quantity, pack, value)
+      out_of_pack = quantity % pack
+      if  promo[product].has_key?(:package) and quantity >= pack
+        return function(quantity, out_of_pack, one_s_price, value)
+        else return '0.00'.to_d
+      end
+    end
+
+= slide 'Странен код', 'малко по-добре е така' do
+  example:
+    def package(product, one_s_price, quantity, pack, value)
+      out_of_pack = quantity % pack
+
+      if promo[product].has_key?(:package) and quantity >= pack
+        a_better_named_function(quantity, out_of_pack, one_s_price, value)
+      else
+        '0.00'.to_d
+      end
+    end
+
+= slide 'Владеене на езика' do
+  list:
+    Необходимо е да се стараете не само в Ruby (или изобщо в програмните езици), но и в майчиния си език
+    Бъдете консистентни — коментари и на български, и на английски не са добра идея
+    `raise 'Give me a name, not a novell!' if item_name.length > 40` — <em>novel</em> се пише с едно <strong>l</strong>
+
+
+= slide 'Coding-style Guide в Ruby', 'произведение на г-н Бацов и с-ие' do
+  list:
+    Хвърлете едно око на този <a href="https://github.com/bbatsov/ruby-style-guide#readme">неофициален guide за стил на кода в Ruby</a>
+    Не сме 100% съгласни с този guide, но в голямата си част ще ви е полезен
+    С всеки изписан символ код, се замислете дали ще се чете лесно и разбере лесно от средностатистическия член на вашия екип
+    Ако пишете код сам, трябва да си налагате още по-тежки ограничения — ще се благославяте след месец, месец и нещо...
+    Успех! :)
+
