@@ -99,12 +99,12 @@
 
 = slide 'Примерно решение', 'с рекурсивни групи' do
   annotate:
-    validator = /^(\(car \g<1>*[\w]*\))*$/
+    validator = /^(\(car \g<1>*\w*\))*$/
 
     valid   = '(car (car (car (car list))))'
     invalid = '(car (car (car list))'
 
-    validator.match(valid) ? true : false   # =>
+    validator.match(valid)   ? true : false # =>
     validator.match(invalid) ? true : false # =>
 
 = slide 'Look-ahead и look-behind' do
