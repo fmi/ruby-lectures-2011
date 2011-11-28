@@ -1,0 +1,147 @@
+= slide 'Днес' do
+  list:
+    Синоними на методи
+    Замразяване и зацапване на обекти
+    Различни дреболии в Ruby, които все още не сме споменавали
+
+= slide 'Преди това...', 'По темата с captchas...' do
+  img src="images/captcha-challenge-accepted.png" alt="Captcha - Challenge Accepted"
+
+= slide 'Кодировки на source-файловете ви в Ruby' do
+  list:
+    Пазете файловете си в UTF-8
+    Указвате това на Ruby-интерпретатора с: `# encoding: UTF-8`
+    Горното е коментар в началото на вашия `something.rb`-файл
+    Например, вместо това:
+  div.action
+    example:
+      # encoding: ISO-8859-1
+      #използвам и този encoding и в тестовете иначе ми дава грешка
+  list:
+    По-добре е така:
+  div.action
+    example:
+      # encoding: UTF-8
+  list:
+
+= slide 'Синоними на методи в Ruby' do
+  list:
+    Можете да дефинирате синоними на методи в Ruby, посредством:
+    Ключовата дума `alias`
+    Методът `Module#alias_method`
+    И двете правят достъпно копие на тялото на даден метод под друго име
+    Използват се много във вградените в Ruby-методи, например `String#size` и `String#length`
+    Удобни са в някои ситуации, в които `super` не помага
+
+= slide 'Синтаксис за синоними на методи' do
+  list:
+    С ключовата дума `alias`: `alias :new_method :old_method`
+    Или: `alias new_method old_method` (забележете, че това не са символи или низове, a идентификатори)
+    С метода от стандартната библиотека `Module#alias_method`:
+    `alias_method :new_method, :old_method`
+    Или: `alias_method 'new_method', 'old_method'`
+
+= slide 'Семантика на синоними на методи' do
+  list:
+    Alias-ите не са обикновени синоними, symlink-ове, указатели и прочее
+    Това, което се случва при "alias"-ване на методи, е приблизително еквивалентно на копиране на тялото на оригиналния метод
+    Ако модифицирате тялото на оригиналния метод след като сте го "alias"-нали, alias-ът ще запази старото тяло
+
+= slide 'Синоними на методи' do
+  list:
+    Например:
+  div.action
+    example:
+      def to_s
+        to_html
+      end
+  list:
+    По-добре да се запише така:
+  div.action
+    example:
+      alias_method :to_html, :to_s
+  list:
+    Или така:
+  div.action
+    example:
+      alias to_html to_s
+
+= slide 'Разлики между alias и alias_method' do
+  list:
+    На първо място, `alias` е ключова дума, докато `alias_method` е обикновен метод от `Module`
+    От горното следват и повечето разлики между двете:
+    При `alias` може да подавате като аргументи направо идентификатори на методи, например:
+    `alias original_to_s to_s` ще направи нов синоним на `to_s` под името `original_to_s`
+    `alias_method original_to_s to_s` ще интерпретира `original_to_s` и `to_s` като имена на променливи
+    Зад тези имена трябва да стои низ или символ, указващ име на метод
+    По този начин може да правите синоними на методи динамично, докато с `alias` това не става
+
+= slide 'Разлики между alias и alias_method', 'създаване на синоними по време на изпълнение' do
+  example:
+    class TranslationsController
+      LOCALES = [:en, :de, :fr, :es, :ja]
+
+      def completed_translations
+        @current_locale = $1 if current_action_name =~ /_(\w{2})$/
+      end
+
+      LOCALES.each do |locale|
+        alias_method "completed_translations_in_{locale}", completed_translations
+      end
+    end
+
+= slide 'Забележки относно синоними на методи' do
+  list:
+    Ползвайте `super` когато можете и избягвайте `alias_*` когато е възможно
+    Не забравяйте, че `super` работи и за методи, които са дошли от `include`-ване на модули във вашия клас
+    Някои инструменти, които генерират документация от вашия код, имат проблеми с тази техника
+    Тъй като `alias` е ключова дума и подлежи на статичен синтактичен анализ, такива инструменти разпознават тези синоними
+    За разлика от това, `Module#alias_method` обикновено не се разпознава в тези случаи, понеже не може да ползвате статичен синтактичен анализ за целта
+
+= slide 'Замразяване на обекти в Ruby' do
+  list:
+    Реално превръща mutable-обекти в immutable
+    Замразяването става с `Object#freeze`
+    Можете да проверите дали обект е замразен с `Object#frozen?`
+    Веднъж замразен, даден обект не може да бъде размразен
+    Не можете да променяте вече замразени обекти
+    Възможно е да доведе до ускоряване на вашия код
+    Често се ползва, когато присволявате mutable-типове на константи
+
+= slide 'Замразяване на обекти' do
+  example:
+    module Entities
+      ENTITIES = {
+        '&' => '&amp;',
+        '"' => '&quot;',
+        '<' => '&lt;',
+        '>' => '&gt;',
+      }.freeze
+
+      ENTITY_PATTERN = /#{ENTITIES.keys.join('|')}/.freeze
+
+      def escape(text)
+        text.gsub ENTITY_PATTERN, ENTITIES
+      end
+    end
+
+= slide 'Оцапани обекти в Ruby' do
+  list:
+    `Object#taint`
+    `Object#tainted?`
+
+= slide 'Достъп до полета на класа' do
+  list:
+    Не забравяйте за `attr_reader`/`attr_accessor`
+    Например:
+  div.action
+    example:
+      def inspect
+        @text
+      end
+  list:
+    Може и така:
+  div.action
+    example:
+      attr_reader :text
+      alias_method :inspect, :text
