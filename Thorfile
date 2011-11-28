@@ -14,8 +14,9 @@ class Default < Thor
   desc 'rebuild', 'Rebuilds all presentations'
   def rebuild
     empty_directory 'compiled'
-    directory 'html/js', 'compiled/js'
-    directory 'html/css', 'compiled/css'
+    %w( js css images ).each do |folder|
+      directory "html/#{folder}", "compiled/#{folder}"
+    end
     copy_file 'lectures/index.yml', 'compiled/index.yml'
 
     slides.keys.each do |number|
