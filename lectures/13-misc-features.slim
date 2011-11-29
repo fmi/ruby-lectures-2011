@@ -2,10 +2,19 @@
   list:
     Синоними на методи
     Замразяване и зацапване на обекти
+    Инструменти за генериране на документация
     Различни дреболии в Ruby, които все още не сме споменавали
 
 = slide 'Преди това...', 'По темата с captchas...' do
   img src="images/captcha-challenge-accepted.png" alt="Captcha - Challenge Accepted"
+
+= slide 'Относно пета задача...' do
+  list:
+    Проверена е
+    Получавате максимум 8 точки, вместо 6
+    Още не сме приключили с наказателните точки (за лоша идентация, нечетим код и прочее)
+    Не сме приключили и с бонус-точките :)
+    Ако имате коментари, смислени възражения или критика, пишете ни
 
 = slide 'Кодировки на source-файловете ви в Ruby' do
   list:
@@ -98,6 +107,22 @@
     Тъй като `alias` е ключова дума и подлежи на статичен синтактичен анализ, такива инструменти разпознават тези синоними
     За разлика от това, `Module#alias_method` обикновено не се разпознава в тези случаи, понеже не може да ползвате статичен синтактичен анализ за целта
 
+= slide 'Достъп до полета на класа' do
+  list:
+    Не забравяйте за `attr_reader`/`attr_accessor`
+    Например:
+  div.action
+    example:
+      def inspect
+        @text
+      end
+  list:
+    Може и така:
+  div.action
+    example:
+      attr_reader :text
+      alias_method :inspect, :text
+
 = slide 'Замразяване на обекти в Ruby' do
   list:
     Реално превръща mutable-обекти в immutable
@@ -127,21 +152,35 @@
 
 = slide 'Оцапани обекти в Ruby' do
   list:
-    `Object#taint`
-    `Object#tainted?`
+    `Object#taint` - маркира даден обект като "зацапан", т.е. потенциално опасен
+    `Object#tainted?` ще ви върне `true`, ако обект е маркиран като замърсен
+    Ако конструирате нов обект, на база на "зацапан" такъв, новият обект също ще е "зацапан"
+    Всички данни, влизащи във вашата програма "отвън", се маркират като "зацапани"
+    Идва от Perl и навремето се е ползвало много активно при писане на CGI-скриптове като някаква форма на защитна мярка
 
-= slide 'Достъп до полета на класа' do
+= slide 'Документация в Ruby' do
   list:
-    Не забравяйте за `attr_reader`/`attr_accessor`
-    Например:
-  div.action
-    example:
-      def inspect
-        @text
-      end
+    Пишете ли документация? Как? Къде?
+    Както повечето други езици и платформи, и в Ruby има инструменти за автоматично генериране на документация
+    RDoc — Ruby documentation
+    Seattle.rb проект; дефакто стандарт
+    YARD — инструмент, разширяващ RDoc-стандарта
+
+= slide 'RDoc' do
+  img src="images/rdoc-default.png"
+
+= slide 'YARD' do
+  img src="images/rdoc-yard.png"
+
+= slide 'Други - Rails API документацията' do
+  img src="images/rdoc-rails.png"
+
+= slide 'Други - API Dock' do
+  img src="images/rdoc-apidock.png"
+
+= slide 'Подробно относно RDoc' do
   list:
-    Може и така:
-  div.action
-    example:
-      attr_reader :text
-      alias_method :inspect, :text
+    Официална документация относно позволения маркъп (малко трудна за откриване):
+    <a href="http://docs.seattlerb.org/rdoc/RDoc/Markup.html">http://docs.seattlerb.org/rdoc/RDoc/Markup.html</a>
+    Обща документация на RDoc:
+    <a href="http://docs.seattlerb.org/rdoc/index.html">http://docs.seattlerb.org/rdoc/index.html</a>
