@@ -47,6 +47,6 @@
   slug: 11-regular-expressions-2-and-ruby-style
   date: 2011-11-21
 13:
-  title: 13. Разни
-  slug: 13-misc-features
+  title: 13. Разни. alias, freeze, taint. RDoc
+  slug: 13-misc-alias-freeze-taint-rdoc
   date: 2011-11-29
