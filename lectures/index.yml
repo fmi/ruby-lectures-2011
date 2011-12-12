@@ -50,3 +50,7 @@
   title: 12. Разни. alias, freeze, taint. RDoc
   slug: 12-misc-alias-freeze-taint-rdoc
   date: 2011-11-29
+13:
+  title: 13. RSpec and Behavior-Driven Development
+  slug: 13-rspec-and-bdd
+  date: 2011-12-06

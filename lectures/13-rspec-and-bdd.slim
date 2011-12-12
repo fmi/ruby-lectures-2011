@@ -1,0 +1,175 @@
+= slide 'Днес' do
+  list:
+    RSpec
+    Integration tests vs. unit tests
+    Test-Driven Development
+    Behavior-Driven Development
+
+= slide 'Въпросът от по-рано?' do
+  p Какъв е вашият процес?
+
+  p Днес ще си говорим как тестовете се вместват в него.
+
+= slide 'Преди това' do
+  p Какво е unit test и защо го пишем?
+
+  p (това е въпрос към вас?)
+
+= slide 'Градивните единици', '(или "идиници", ако сте от Пловдив)' do
+  p <code>xUnit</code> и производните винаги имат следните три концепции:
+
+  ul
+    li Проверки (assertion)
+    li Тестове (test method)
+    li Групи (test case)
+
+= slide 'RSpec' do
+  list:
+    RSpec е популярен тестов framework за Ruby
+    Имплементира любопитен DSL за писане на тестове
+    Следва идея, наречена <em>behavior-driven development</em>
+    Има нещо, наречено minitest, което е стандарт в 1.9
+    Ние сме класици. Ще ви покажем RSpec
+    Разбира се, може да ползвате minitest за проектите
+
+
+= slide 'Градивните единици', 'в класически xUnit' do
+  example:
+    require 'minitest/autorun'
+
+    class UniverseTest < MiniTest::Unit::TestCase
+      def test_answer_is_positive
+        assert Universe.answer > 0
+      end
+
+      def test_equals_six_multiplied_by_nine
+        assert_equal 42, Universe.answer
+      end
+    end
+
+= slide 'Градивните единици', 'в RSpec' do
+  example:
+    describe Universe do
+      it "contains the answer of life and everything else" do
+        Universe.answer.should == 42
+      end
+
+      it "likes to give even answers" do
+        Universe.answer.should be_even
+      end
+    end
+
+= slide 'RSpec', 'тест и група' do
+  example:
+    describe 'System under test' do
+      it 'has a specific behavior' do
+        # ...
+      end
+    end
+
+  list:
+    `describe` анотира групата
+    `it` анотира конкретния тест
+    Имената са текст. Могат да бъдат дескриптивни
+    Тялото на `it`-а е самия тест
+
+= slide 'RSpec', 'проверки' do
+  example:
+    describe 'System under test' do
+      it 'has a specific behavior' do
+        answer.should == 42
+      end
+    end
+
+  list:
+    Проверката става в `should нещо`
+    "нещо" може да са много неща
+    *trollface*
+    това е най-простия вариант
+
+= slide 'Rspec', 'обърнете внимание' do
+  list:
+    По-дескриптивни имена на тестовете
+    По-четими проверки
+    Специален DSL за целта
+    Последното е една от големите сили на Ruby
+
+= slide 'Проверките', 'още expectations' do
+  p Какви неща може да сложите след <code>should</code> (или <code>should_not</code>)
+
+= slide 'eq', 'още should ==' do
+  p Проверява дали нещата са равни с <code>==</code>
+
+  example:
+    actual.should eq(expected)
+    actual.should_not eq(expected)
+    actual.should == expected
+    actual.should_not == expected
+
+    actual.should eq expected
+
+= slide 'eql и equal' do
+  p Като съответните методи с <code>?</code>
+
+  example:
+    actual.should eql expected
+    actual.should equal expected
+
+= slide 'be_*', '(и have_*)' do
+  p <code>be_foo</code> проверява <code>foo?</code>
+
+  example:
+    7.should_not be_zero
+    [].should be_empty
+    x.should be_multiple_of(3)
+
+    {a: 2}.should have_key(:a)
+
+= slide 'have(n).items' do
+  example:
+    group.should have(3).users
+
+    assert_equal 3, group.users.size
+
+= slide 'before' do
+  example:
+    describe 'Something' do
+      before do
+        @answer = 6 * 9
+      end
+
+      it 'is fourty-two' do
+        @answer.should eq 42
+      end
+
+      it 'is non-zero' do
+        @answer.should_not be_zero
+      end
+    end
+
+= slide 'after' do
+  p Има и <code>after</code> блок, аналогичен на <code>before</code>
+
+= slide 'helper методи' do
+  example:
+    describe 'Something' do
+      def answer
+        42
+      end
+
+      it 'has the answer' do
+        answer.should eq 42
+      end
+    end
+
+= slide 'let' do
+  p На практика, мемоизиран метод
+
+  example:
+    describe 'Answer to life' do
+      let(:answer) { 42 }
+
+      it 'is non-zero' do
+        answer.should_not be_zero
+      end
+    end
