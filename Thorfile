@@ -14,7 +14,7 @@ class Default < Thor
   desc 'rebuild', 'Rebuilds all presentations'
   def rebuild
     empty_directory 'compiled'
-    %w( js css images ).each do |folder|
+    %w(js css images).each do |folder|
       directory "html/#{folder}", "compiled/#{folder}"
     end
     copy_file 'lectures/index.yml', 'compiled/index.yml'
@@ -47,6 +47,7 @@ class Default < Thor
     builder = builder_for(index)
 
     create_file "compiled/#{builder.output_filename}", builder.html.force_encoding('BINARY')
+    directory "lectures/#{index}", "compiled/#{index}" if File.directory?("lectures/#{index}")
   end
 
   no_tasks do
