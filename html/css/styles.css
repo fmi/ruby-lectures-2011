@@ -47,7 +47,8 @@ nav button { float: left; border: 0; width: 26px; height: 25px; text-indent: -99
 .slide h1 { font-size: 32px; }
 .slide h2 { font-size: 26px; }
 .slide p { font-size: 20px; margin: 0 0 1em; }
-.slide li { list-style-type: disc; margin-left: 40px; font-size: 20px; }
+.slide ul li { list-style-type: disc; margin-left: 40px; font-size: 20px; }
+.slide ol li { list-style-type: decimal; margin-left: 40px; font-size: 20px; }
 .slide pre { font-size:20px; font-family: monospace; }
 .slide hgroup { margin: 0 0 20px; }
 
