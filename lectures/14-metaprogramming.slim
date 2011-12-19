@@ -371,7 +371,7 @@
     instance.answer # =>
 
     anonymous # =>
-  
+
 = slide 'Class.new', 'с константа' do
   p Ако присвоите <code>Class.new</code> на константа, стават магии
 
@@ -413,7 +413,7 @@
     vars.eval('x') # =>
 
 = slide 'Kernel#binding (2)' do
-  annotate:
+  example:
     x = 1_024
 
     def foo
@@ -422,9 +422,9 @@
     end
 
     vars = foo
-    vars.eval('y') # =>
-    vars.eval('x') #!
-    
+    vars.eval('y') # 42
+    vars.eval('x') # error: NameError
+
 = slide 'Binding', 'вложеност' do
   list:
     Най-просто, това е лексикалния scope в момента
@@ -436,16 +436,16 @@
 = slide 'Scope gates' do
   p <code>module</code>, <code>class</code> и <code>def</code> секват binding-а
 
-  annotate:
+  example:
     top_level = 1
     module Something
       in_module = 2
       class Other
         in_class = 3
         def larodi
-          top_level #!
-          in_module #!
-          in_class  #!
+          top_level # error: NameError
+          in_module # error: NameError
+          in_class  # error: NameError
         end
       end
     end
@@ -456,16 +456,16 @@
   p Scope gate-овете могат да се заобиколят с <code>define_method</code>, <code>Class.new</code> и <code>Module.new</code>.
 
 = slide 'Scope gates', 'define_method' do
-  annotate:
+  example:
     top_level = 1
     module Something
       in_module = 2
       class Other
         in_class = 3
         define_method :larodi do
-          top_level #!
-          in_module #!
-          in_class  # =>
+          top_level # error: NameError
+          in_module # error: NameError
+          in_class  # 3
         end
       end
     end
@@ -473,16 +473,16 @@
     Something::Other.new.larodi
 
 = slide 'Scope gates', 'Class.new' do
-  annotate:
+  example:
     top_level = 1
     module Something
       in_module = 2
       Other = Class.new do
         in_class = 3
         define_method :larodi do
-          top_level #!
-          in_module # =>
-          in_class  # =>
+          top_level # error: NameError
+          in_module # 2
+          in_class  # 3
         end
       end
     end
@@ -490,16 +490,16 @@
     Something::Other.new.larodi
 
 = slide 'Scope gates', 'Module.new' do
-  annotate:
+  example:
     top_level = 1
     Something = Module.new do
       in_module = 2
       Other = Class.new do
         in_class = 3
         define_method :larodi do
-          top_level # =>
-          in_module # =>
-          in_class  # =>
+          top_level # 1
+          in_module # 2
+          in_class  # 3
         end
       end
     end

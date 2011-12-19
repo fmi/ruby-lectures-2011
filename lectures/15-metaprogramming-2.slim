@@ -271,7 +271,7 @@
     Something.singleton_class        # =>
     Other.superclass.singleton_class # =>
 
-    Something.singleton_class == Other.superclass.singleton_class # =>
+    Something.singleton_class == Other.singleton_class.superclass # =>
 
 = slide 'Класови методи и наследяване', 'визуализация' do
   img src="15/class-metaclass-superclass.svg" style="width: 80%"
