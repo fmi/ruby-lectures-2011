@@ -505,3 +505,21 @@
     end
 
     Other.new.larodi
+
+= slide 'Използване на BasicObject за създаване на „прокси“' do
+  annotate:
+    class Proxy < BasicObject
+      def initialize(obj)
+        @instance = obj
+      end
+  
+      def method_missing(name, *args, &block)
+        $stdout.puts "Calling #{ name } with (#{ args.join(', ') })"
+        @instance.send(name, *args)
+      end
+    end
+
+    a = []
+    b = Proxy.new a
+
+    b.length # =>
