@@ -4,7 +4,7 @@
     Какви са възможностите на Rails накратко
     Как се разпространява Rails и как да си го инсталираме (`gem install rails`)
     Какви са основните компоненти, съставящи Rails
-    Започнахме едно малко примерно уеб-приложение на Rails
+    Започнахме едно <a href="https://github.com/mitio/quizzes/tree/part-1">малко примерно уеб-приложение на Rails</a>
 
 = slide 'Какво ще правим днес?' do
   list:
@@ -23,13 +23,129 @@
     `rails -h` за помощ относно наличните команди
     `rails new app_name` създава ново празно приложение, кръстено AppName
     `rails g scaffold quiz` генерира "скеле", позволяващо CRUD-операции с ресурса Quiz (модел, контролер, изгледи, тестове)
+    `rails g` без аргументи ще ви покаже пълен списък на генераторите, които са налични за вашето приложение
     `rake db:migrate` не е генератор, а Rake-задача, която изпълнява новосъздадени миграции на базата данни (добавяне на таблици, колони, индекси...)
     Много други. Полезни са и се ползват често. Разгледайте `rails -h`
 
+= slide 'Житейският път на един request в Rails' do
+  list:
+    1. Вашият уеб-сървър (Nginx, Apache, ...)
+    Заявките до статични файлове (img, css и пр.) обикновено се обработват директно на стъпка 1
+    2. Rails Application сървъра, който ползвате (Phusion Passenger, Thin, Mongrel, WEBrick...)
+    3. Маршрутизиращият модул (routes) посреща заявките и обработва HTTP-хедърите
+    В зависимост от URL-а и HTTP verb-а, както и вашите routing-правила, описани в `config/routes.rb`, се определя дали има кой да обслужи заявката, или трябва да се върне грешка 404
+    4. Рутиращият модул делегира обслужването на request-а до една проста абстракция/интерфейс, наречена Rack-приложение
+
+= slide 'Rack' do
+  blockquote
+    | Rack provides a minimal, modular and adaptable interface for developing web applications in Ruby. By wrapping HTTP requests and responses in the simplest way possible, it unifies and distills the API for web servers, web frameworks, and software in between (the so-called middleware) into a single method call.
+
+= slide 'Примерно Rack-приложение' do
+  example:
+    app = -> do |env|
+      body = "Hello, World!"
+      [
+        200,
+        {
+          "Content-Type"   => "text/plain",
+          "Content-Length" => body.length.to_s,
+        },
+        [body]
+      ]
+    end
+
+    run app
+
+= slide 'Житейският път на един request в Rails (2)' do
+  list:
+    Откъде се взима това Rack-приложение?
+    Rails генерира динамично едно такова просто приложение, което:
+    5. Инстанцира контролер и изпълнява before/after/around филтри
+    6. Инстанцира view-обект и се занимава с рендерирането на отговор
+    7. Връща HTTP-хедърите, рендерирания отговор и HTTP статус
+
 = slide 'Примерното приложение' do
   list:
-    Нека продължим да се занимаваме с примерното приложение, което започнахме предния път
+    Ще продължим да се занимаваме с <a href="https://github.com/mitio/quizzes/tree/part-1">примерното приложение, което започнахме предния път</a>
     Да опитаме да добавим концепция за въпроси и отговори и съответните взаимовръзки между тях и да видим какво ще се получи
+
+= slide 'Промени (1)', 'с връзки до commit-ите в GitHub' do
+  ol
+    li.action
+      a href="https://github.com/mitio/quizzes/commit/c94b408313c4dedb0069e7d235adc30ac591dcda"
+        | Премахнахме ненужен код в <code>QuizzesController</code>, защото не ни е необходимо да рендерираме друго, освен HTML
+    li.action
+      a href="https://github.com/mitio/quizzes/commit/74f3a30b2c7e413b3e2e1285e542ee9a9e0c48b5"
+        | Добавихме валидация в модела <code>Quiz</code>
+      div Можете да намерите <a href="http://guides.rubyonrails.org/active_record_validations_callbacks.html#validations-overview">документация за валидациите в ActiveModel тук</a>
+    li.action
+      a href="https://github.com/mitio/quizzes/commit/b260b787c0ef89dfe1957b4c1c47abb28a05af73"
+        | Генерирахме нов scaffold за ресурси от тип questions
+      span : модел <code>Question</code>, контролер, изгледи, миграция, тестове
+      div Използвахме командата: <code>bundle exec rails g question title:string position:integer</code>
+    li.action
+      a href="https://github.com/mitio/quizzes/commit/a013a364ced2d8f5eb75a75a44976c43bfe6d628"
+        | Добавихме валидации и в модела <code>Question</code>
+    li.action
+      a href="https://github.com/mitio/quizzes/commit/78d3fc3f102f29bbafbaf1fd28aaf34e466d7b32"
+        | Направихме връзка между <code>Quiz</code> и <code>Question</code>
+      div Детайлна информация относно <a href="http://guides.rubyonrails.org/association_basics.html">релациите (асоциации) в Rails ще откриете тук</a>
+
+= slide 'Промени (2)' do
+  ol
+    li.action
+      a href="https://github.com/mitio/quizzes/commit/a238a89d62fde40e9025d46ae912e1c2b8d515a3"
+        | Направихме разумното нещо — подчинихме <code>Question</code> на <code>Quiz</code>
+      div Това изискваше от нас да направим дефиниция на вложен ресурс в <code>config/routes.rb</code> и да променим <code>QuestionsController</code> и файловете с изгледите (views) за въпросите така, че да използват правилно новите nested URL-и
+    li.action
+      | По-детайлно обяснение за вложени ресурси и изобщо за целия <a href="http://guides.rubyonrails.org/routing.html">маршрутизатор в Rails ще откриете тук</a>
+    li.action
+      | В предната промяна се наложи също така да ползваме <code>before_filter</code>, за да изпълним код преди извикването на всеки action в <code>QuestionsController</code>; научете <a href="http://guides.rubyonrails.org/action_controller_overview.html#filters">повече за филтрите в Rails тук</a>
+    li.action
+      | В <a href="http://guides.rubyonrails.org/action_controller_overview.html">същата секция от документацията на Rails</a> ще намерите информация за <code>params</code>, сесии и бисквитки, различни rendering-опции, прихващане на някои грешки и прочее
+    li.action
+      a href="https://github.com/mitio/quizzes/commit/79851b04db0291de0c5cbc6e20ba4e4b4030af6d"
+        | Премахнахме ненужния ни rendering-код от <code>QuestionsController</code>, за да опростим нещата
+      div С това приключихме този етап на промени
+
+= slide '"Автоматичен" админ-панел в Rails', 'или как да разширим допълнително това, което Rails ни дава' do
+  list:
+    Можем да разширяваме и/или променяме базовите възможности, които Rails ни предлага, посредством gem-файлове или плъгини (първото се предпочита)
+    Например, за да добие нашето приложение функционалност на "автоматична" админ-система (подобна на тази в Django), можем да добавим някой gem, който прави това
+    Един такъв gem е <a href="http://activeadmin.info">Active Admin</a> (не е писан от разработчиците на Rails); ще го инсталираме в нашето приложение
+
+= slide 'Добавяне на gem-зависимост към нашето приложение', 'инсталация на Active Admin' do
+  list:
+    За да добавим външна библиотека към нашето приложение, се възползваме от възможностите на <a href="http://gembundler.com/">Bundler</a>
+    Добавяме зависимостта в нашия <code>Gemfile</code>: <code>gem 'activeadmin'</code>
+    Изпълняваме <code>bundle install</code>
+    <a href="https://github.com/mitio/quizzes/commit/c794ac75789e141c1cadde989117031f60e63214">Резултатът можете да видите тук</a>
+
+= slide 'Подкарване на Active Admin' do
+  list:
+    За да се възползваме от възможностите на Active Admin, е необходимо преди това да бъдат създадени няколко конфигурационни файла и модел, който да олицетворява нашия административен потребител
+    Това може да стане лесно посредством генератора `bundle exec rails g active_admin:install`
+    Как разбрахме, че трябва да изпълним този генератор? Или сме прочели <a href="http://activeadmin.info/docs/0-installation.html">документацията на Active Admin</a>, или сме написали `bundle exec rails g` и сме го видели в списъка с налични генератори :)
+    Вижте <a href="https://github.com/mitio/quizzes/commit/7d9b663cb9fd3c130016b18604378d21da394a1e">какви промени прави в кода ви този генератор</a>
+    След това изпълняваме `bundle exec rake db:migrate`, за да вкараме в базата <a href="https://github.com/mitio/quizzes/commit/2b4bd83fb124938b1714ff4b52e0f8c7e4c04d35">новите миграции</a>
+
+= slide 'Добавяне на ресурси към Active Admin' do
+  list:
+    От този момент нататък, добавянето на ресурси към вашия административен интерфейс става много просто:
+    Изпълнявате `bundle exec rails g active_admin:resource NAME`, където `NAME` е името на ресурса (напр. `quiz`)
+    Резултатът от горната команда е <a href="https://github.com/mitio/quizzes/commit/872f9bed01f799937ceffac7eb8ea095f22ae492">следният код</a>
+    Въпросният код е достатъчен, за да имате работещ и използваем CRUD-интерфейс над `Quiz`
+    Можете да видите и <a href="https://github.com/mitio/quizzes/compare/872f9bed...e9b5083998">как се добавя вложеният ресурс `Question` в административния интерфейс</a>
+
+= slide 'Резултатът', 'от нашето примерно приложение' do
+  list:
+    Резултатът <a href="https://github.com/mitio/quizzes/tree/part-2">е това уеб-приложение</a>
+    Ако искате да го подкарате при вас, <a href="https://github.com/mitio/quizzes#readme">следвайте инструкциите тук</a>
+    След като пуснете приложението, може да отворите <a href="http://localhost:3000/">http://localhost:3000/</a> и да си поиграете
+    Ако имате създаден quiz с ID 1, то на <a href="http://localhost:3000/quizzes/1/questions">http://localhost:3000/quizzes/1/questions</a> ще може да достъпите и редактирате въпросите към този quiz, под формата на вложен ресурс
+    Административният панел, поддържан от Active Admin, се намира в <a href="http://localhost:3000/admin">http://localhost:3000/admin</a>
+    В панела може да се влезе с потребител `admin@example.com` и парола `password`
+    Можете да видите и <a href="https://github.com/mitio/quizzes/compare/part-1...part-2">пълен списък на промените, които направихме в приложението</a> на днешната сбирка
 
 = slide 'Сайтът на курса' do
   p Не забравяйте:
