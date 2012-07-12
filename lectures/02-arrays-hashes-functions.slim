@@ -88,10 +88,10 @@
   p Какво извежда следния код и защо?
 
   example:
-    puts 'foo' == 'foo', 'foo'.eql? 'foo'
-    puts [] == [],       [].eql? []
-    puts 42 == 42,       42.eql? 42
-    puts :foo == :foo,   :foo.eql? :foo
+    puts 'foo' == 'foo', 'foo'.equal? 'foo'
+    puts [] == [],       [].equal? []
+    puts 42 == 42,       42.equal? 42
+    puts :foo == :foo,   :foo.equal? :foo
 
   .action.answer
     p <code>==</code> сравнява по стойност, а <code>equal?</code> по идентитет.
